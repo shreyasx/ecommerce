@@ -27,8 +27,10 @@ var userSchema = new mongoose.Schema(
 		},
 		encry_password: {
 			type: String,
-			required: true,
+			required: false,
 		},
+		fb_id: { type: String, default: "" },
+		google_id: { type: String, default: "" },
 		salt: String,
 		role: {
 			type: Number,

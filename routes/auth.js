@@ -1,7 +1,13 @@
 var express = require("express");
 var router = express.Router();
 const { check } = require("express-validator");
-const { signout, signup, signin, isSignedIn } = require("../controllers/auth");
+const {
+	signout,
+	signup,
+	signin,
+	isSignedIn,
+	facebook,
+} = require("../controllers/auth");
 
 router.post(
 	"/signup",
@@ -14,6 +20,8 @@ router.post(
 	],
 	signup
 );
+
+router.post("/signup/facebook", facebook);
 
 router.post(
 	"/signin",

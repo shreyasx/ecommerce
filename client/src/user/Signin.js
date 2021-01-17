@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Base from "../core/Base";
 import { Redirect } from "react-router-dom";
 import { signin, authenticate, isAuthenticated } from "../auth/helper";
+import FacebookLogin from "react-facebook-login";
+import { API } from "../backend";
 
 const Signin = () => {
 	const [values, setValues] = useState({
@@ -35,7 +37,9 @@ const Signin = () => {
 					});
 				}
 			})
-			.catch(console.log("Signin request failed"));
+			.catch(er => {
+        console.log("Signin request failed");
+      });
 	};
 
 	const performRedirect = () => {
@@ -100,6 +104,18 @@ const Signin = () => {
 								type="password"
 							></input>
 						</div>
+						<div
+							className="fb-login"
+							style={{ textAlign: "center", margin: "20px auto" }}
+						>
+							<FacebookLogin
+								appId="432706677778563"
+								autoLoad={false}
+								fields="name,email"
+								onClick={componentClicked}
+								callback={responseFacebook}
+							/>
+						</div>
 						<button onClick={onSubmit} className="btn btn-success btn-block">
 							Submit
 						</button>
@@ -107,6 +123,38 @@ const Signin = () => {
 				</div>
 			</div>
 		);
+	};
+
+	const componentClicked = () => {
+		setValues({ ...values, error: false, loading: true });
+	};
+
+	const responseFacebook = response => {
+		const { name, email, userID } = response;
+		fetch(`${API}/signup/facebook`, {
+			method: "POST",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ name, email, userID }),
+		})
+			.then(r => r.json())
+			.then(data => {
+				if (data.error) {
+					setValues({ ...values, error: data.error, loading: false });
+				} else {
+					authenticate(data, () => {
+						setValues({
+							...values,
+							didRedirect: true,
+						});
+					});
+				}
+			})
+			.catch(er => {
+        console.log("Signin request failed");
+      });
 	};
 
 	return (
