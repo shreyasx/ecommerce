@@ -7,6 +7,7 @@ const {
 	signin,
 	isSignedIn,
 	facebook,
+	google,
 } = require("../controllers/auth");
 
 router.post(
@@ -22,6 +23,7 @@ router.post(
 );
 
 router.post("/signup/facebook", facebook);
+router.post("/signup/google", google);
 
 router.post(
 	"/signin",

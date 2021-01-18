@@ -4,6 +4,7 @@ import { Redirect } from "react-router-dom";
 import { signin, authenticate, isAuthenticated } from "../auth/helper";
 import FacebookLogin from "react-facebook-login";
 import { API } from "../backend";
+import { GoogleLogin } from "react-google-login";
 
 const Signin = () => {
 	const [values, setValues] = useState({
@@ -38,8 +39,8 @@ const Signin = () => {
 				}
 			})
 			.catch(er => {
-        console.log("Signin request failed");
-      });
+				console.log("Signin request failed");
+			});
 	};
 
 	const performRedirect = () => {
@@ -104,6 +105,9 @@ const Signin = () => {
 								type="password"
 							></input>
 						</div>
+						<button onClick={onSubmit} className="btn btn-success btn-block">
+							Submit
+						</button>
 						<div
 							className="fb-login"
 							style={{ textAlign: "center", margin: "20px auto" }}
@@ -115,14 +119,46 @@ const Signin = () => {
 								onClick={componentClicked}
 								callback={responseFacebook}
 							/>
+							<GoogleLogin
+								clientId="327673455287-3gd4knbeek3bsb86tkbcl29oagpppbg4.apps.googleusercontent.com"
+								buttonText="Continue with Google"
+								onSuccess={responseGoogle}
+								onFailure={responseGoogle}
+								cookiePolicy={"single_host_origin"}
+							/>
 						</div>
-						<button onClick={onSubmit} className="btn btn-success btn-block">
-							Submit
-						</button>
 					</form>
 				</div>
 			</div>
 		);
+	};
+
+	const responseGoogle = response => {
+		const { name, email, googleId } = response.profileObj;
+		fetch(`${API}/signup/google`, {
+			method: "POST",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ name, email, googleId }),
+		})
+			.then(r => r.json())
+			.then(data => {
+				if (data.error) {
+					setValues({ ...values, error: data.error, loading: false });
+				} else {
+					authenticate(data, () => {
+						setValues({
+							...values,
+							didRedirect: true,
+						});
+					});
+				}
+			})
+			.catch(er => {
+				console.log("Signin request failed");
+			});
 	};
 
 	const componentClicked = () => {
@@ -153,8 +189,8 @@ const Signin = () => {
 				}
 			})
 			.catch(er => {
-        console.log("Signin request failed");
-      });
+				console.log("Signin request failed");
+			});
 	};
 
 	return (

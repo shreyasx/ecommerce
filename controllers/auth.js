@@ -3,6 +3,46 @@ const { body, validationResult } = require("express-validator");
 var jwt = require("jsonwebtoken");
 var expressJwt = require("express-jwt");
 
+exports.google = (req, res) => {
+	const { name, email, googleId } = req.body;
+	User.findOne({ google_id: googleId }, (err, user) => {
+		if (err) {
+			console.log("err- ", err);
+			res.json(err);
+			return;
+		} else if (!user) {
+			const newUser = new User({ name, email, google_id: googleId });
+			newUser
+				.save()
+				.then(() => {
+					//create token
+					const token = jwt.sign({ _id: newUser._id }, process.env.SECRET);
+
+					//put token in cookie
+					res.cookie("token", token, { expire: new Date() + 99 });
+
+					//send response  to frontend
+					const { _id, name, email, role } = newUser;
+					return res.json({ token, user: { _id, name, email, role } });
+				})
+				.catch(er => {
+					console.log(er);
+					res.json({ error: "user email already exists" });
+				});
+		} else {
+			//create token
+			const token = jwt.sign({ _id: user._id }, process.env.SECRET);
+
+			//put token in cookie
+			res.cookie("token", token, { expire: new Date() + 99 });
+
+			//send response  to frontend
+			const { _id, name, email, role } = user;
+			return res.json({ token, user: { _id, name, email, role } });
+		}
+	});
+};
+
 exports.facebook = (req, res) => {
 	const { name, email, userID } = req.body;
 	User.findOne({ fb_id: userID }, (err, user) => {
