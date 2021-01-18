@@ -11,24 +11,34 @@ exports.google = (req, res) => {
 			res.json(err);
 			return;
 		} else if (!user) {
-			const newUser = new User({ name, email, google_id: googleId });
-			newUser
-				.save()
-				.then(() => {
-					//create token
-					const token = jwt.sign({ _id: newUser._id }, process.env.SECRET);
-
-					//put token in cookie
-					res.cookie("token", token, { expire: new Date() + 99 });
-
-					//send response  to frontend
-					const { _id, name, email, role } = newUser;
-					return res.json({ token, user: { _id, name, email, role } });
-				})
-				.catch(er => {
+			User.findOne({ email }, (er, use) => {
+				if (er) {
 					console.log(er);
+					return;
+				}
+				if (use) {
 					res.json({ error: "user email already exists" });
-				});
+					return;
+				}
+				const newUser = new User({ name, email, google_id: googleId });
+				newUser
+					.save()
+					.then(() => {
+						//create token
+						const token = jwt.sign({ _id: newUser._id }, process.env.SECRET);
+
+						//put token in cookie
+						res.cookie("token", token, { expire: new Date() + 99 });
+
+						//send response  to frontend
+						const { _id, name, email, role } = newUser;
+						return res.json({ token, user: { _id, name, email, role } });
+					})
+					.catch(er => {
+						console.log(er);
+						res.json({ error: "user email already exists" });
+					});
+			});
 		} else {
 			//create token
 			const token = jwt.sign({ _id: user._id }, process.env.SECRET);
@@ -51,24 +61,34 @@ exports.facebook = (req, res) => {
 			res.json(err);
 			return;
 		} else if (!user) {
-			const newUser = new User({ name, email, fb_id: userID });
-			newUser
-				.save()
-				.then(() => {
-					//create token
-					const token = jwt.sign({ _id: newUser._id }, process.env.SECRET);
-
-					//put token in cookie
-					res.cookie("token", token, { expire: new Date() + 99 });
-
-					//send response  to frontend
-					const { _id, name, email, role } = newUser;
-					return res.json({ token, user: { _id, name, email, role } });
-				})
-				.catch(er => {
+			User.findOne({ email }, (er, use) => {
+				if (er) {
 					console.log(er);
+					return;
+				}
+				if (use) {
 					res.json({ error: "user email already exists" });
-				});
+					return;
+				}
+				const newUser = new User({ name, email, fb_id: userID });
+				newUser
+					.save()
+					.then(() => {
+						//create token
+						const token = jwt.sign({ _id: newUser._id }, process.env.SECRET);
+
+						//put token in cookie
+						res.cookie("token", token, { expire: new Date() + 99 });
+
+						//send response  to frontend
+						const { _id, name, email, role } = newUser;
+						return res.json({ token, user: { _id, name, email, role } });
+					})
+					.catch(e => {
+						console.log(e);
+						res.json({ error: "user email already exists" });
+					});
+			});
 		} else {
 			//create token
 			const token = jwt.sign({ _id: user._id }, process.env.SECRET);
@@ -92,17 +112,28 @@ exports.signup = (req, res) => {
 		});
 	}
 
-	const user = new User(req.body);
-	user.save((err, user) => {
+	User.findOne({ email: req.body.email }, (err, u) => {
 		if (err) {
-			return res.status(400).json({
-				err: "NOT able to save user in DB",
-			});
+			console.log(err);
+			return;
 		}
-		res.json({
-			name: user.name,
-			email: user.email,
-			id: user._id,
+		if (u) {
+			res.json({ error: "An account with that email already exists." });
+			return;
+		}
+		const newObj = { ...req.body, verified: false };
+		const user = new User(newObj);
+		user.save((err, user) => {
+			if (err) {
+				return res.status(400).json({
+					err: "NOT able to save user in DB",
+				});
+			}
+			res.json({
+				name: user.name,
+				email: user.email,
+				id: user._id,
+			});
 		});
 	});
 };
@@ -138,8 +169,8 @@ exports.signin = (req, res) => {
 		res.cookie("token", token, { expire: new Date() + 99 });
 
 		//send response  to frontend
-		const { _id, name, email, role } = user;
-		return res.json({ token, user: { _id, name, email, role } });
+		const { _id, name, email, role, verified } = user;
+		return res.json({ token, user: { _id, name, email, role, verified } });
 	});
 };
 

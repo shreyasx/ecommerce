@@ -10,6 +10,7 @@ var userSchema = new mongoose.Schema(
 			maxlength: 32,
 			trim: true,
 		},
+		verified: { type: Boolean, default: true, required: true },
 		lastname: {
 			type: String,
 			maxlength: 32,
@@ -20,10 +21,6 @@ var userSchema = new mongoose.Schema(
 			required: true,
 			trim: true,
 			unique: true,
-		},
-		userinfo: {
-			type: String,
-			trim: true,
 		},
 		encry_password: {
 			type: String,

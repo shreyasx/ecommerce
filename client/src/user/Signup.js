@@ -54,8 +54,12 @@ const Signup = () => {
 				}
 				signin({ email, password })
 					.then(data => {
-						if (data.error) {
-							setValues({ ...values, error: data.error, loading: false });
+						if (data.error == "Email and password do not match") {
+							setValues({
+								...values,
+								error: "An account with that email already exists.",
+								loading: false,
+							});
 						} else {
 							authenticate(data, () => {
 								setValues({
