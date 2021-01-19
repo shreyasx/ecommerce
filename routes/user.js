@@ -7,6 +7,7 @@ const {
 	updateUser,
 	userPurchaseList,
 	deleteUser,
+	verify,
 } = require("../controllers/user");
 const { isSignedIn, isAuthenticated, isAdmin } = require("../controllers/auth");
 
@@ -21,5 +22,6 @@ router.get(
 	userPurchaseList
 );
 router.get("/delete/:userId", isSignedIn, isAuthenticated, deleteUser);
+router.get("/verify/:userId", isSignedIn, isAuthenticated, verify);
 
 module.exports = router;

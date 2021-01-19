@@ -1,8 +1,64 @@
 const User = require("../models/user");
 const Order = require("../models/order");
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
+const Token = require("../models/Token");
+
+const createToken = userID => {
+	const tokenS = new Token({
+		userId: userID,
+		token: crypto.randomBytes(16).toString("hex"),
+	});
+	tokenS.save((err, response) => {
+		if (err) {
+			console.log("unable to save token in db.");
+			return;
+		}
+	});
+	return tokenS.token;
+};
+
+const transporter = nodemailer.createTransport({
+	service: "gmail",
+	auth: {
+		user: "2gi19cs140@students.git.edu",
+		pass: "hupfwsmwznwchtsf",
+	},
+});
+
+const sendMail = (user, res) => {
+	var mailOptions = {
+		from: "shreyxs@gmail.com",
+		to: user.email,
+		subject: "Account Verification Token",
+		text:
+			`Hello ${user.name},\n\n` +
+			"Please verify your account by clicking the link: \nhttp://" +
+			"localhost:2020" +
+			"/confirmation?token=" +
+			createToken(user.id) +
+			"\n",
+	};
+	transporter.sendMail(mailOptions, function (err, msg) {
+		if (err) {
+			console.log("send mail error -", err.message);
+			res.json({ error: "Couldn't send mail to your address." });
+		} else {
+			console.log(
+				`sent account verification email to ${user.email} sucessfully.`
+			);
+			res.json("Sent mail");
+		}
+	});
+};
+
+exports.verify = (req, res) => {
+	User.findOne({ _id: req.profile._id }, (er, user) => {
+		sendMail(user, res);
+	});
+};
 
 exports.deleteUser = (req, res) => {
-	console.log(req.profile._id);
 	User.deleteOne({ _id: req.profile._id })
 		.then(r => res.json("Account deleted successfully!"))
 		.catch(console.log);
