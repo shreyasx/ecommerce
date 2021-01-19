@@ -9,7 +9,7 @@ const Delete = ({ history }) => {
 			<h1 className="text-white">Are you sure?</h1>
 			<h2 className="text-white">We're sorry to see you go!</h2>
 			{loading ? (
-				<h3>Loading...</h3>
+				<h3 className="alert alert-info">Loading...</h3>
 			) : (
 				<button
 					onClick={() => {

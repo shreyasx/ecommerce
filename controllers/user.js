@@ -3,6 +3,49 @@ const Order = require("../models/order");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const Token = require("../models/Token");
+const { validationResult } = require("express-validator");
+const API = "http://localhost:8000/api";
+
+exports.confirmationPost = (req, res, next) => {
+	const errors = validationResult(req);
+	const { token } = req.query;
+	if (!errors.isEmpty()) {
+		return res.status(422).json({
+			error: errors.array()[0].msg,
+		});
+	}
+	Token.findOne({ token }, function (err, token) {
+		if (!token)
+			return res.status(400).send({
+				type: "not-verified",
+				msg:
+					"We were unable to find a valid token. Your token my have expired.",
+			});
+
+		// If we found a token, find a matching user
+		User.findOne({ _id: token.userId }, function (e, user) {
+			if (!user)
+				return res
+					.status(400)
+					.send({ msg: "We were unable to find a user for this token." });
+			if (user.verified)
+				return res.status(400).send({
+					type: "already-verified",
+					msg: "This user has already been verified.",
+				});
+
+			// Verify and save the user
+			user.verified = true;
+			console.log(`${user.name} - Verified.`);
+			user.save(function (err) {
+				if (err) {
+					return res.status(500).send({ error: err.message });
+				}
+				res.status(200).send("The account has been verified. Please log in.");
+			});
+		});
+	});
+};
 
 const createToken = userID => {
 	const tokenS = new Token({
@@ -34,7 +77,7 @@ const sendMail = (user, res) => {
 		text:
 			`Hello ${user.name},\n\n` +
 			"Please verify your account by clicking the link: \nhttp://" +
-			"localhost:2020" +
+			API +
 			"/confirmation?token=" +
 			createToken(user.id) +
 			"\n",

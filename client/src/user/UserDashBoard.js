@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Base from "../core/Base";
 import { isAuthenticated } from "../auth/helper";
 import { Link, Redirect } from "react-router-dom";
@@ -8,6 +8,25 @@ const UserDashboard = () => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(false);
 	const [redirect, setRedirect] = useState(false);
+	const [verified, setVerified] = useState(true);
+
+	const isVerified = () => {
+		fetch(`${API}/user/${isAuthenticated().user._id}`, {
+			method: "GET",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${isAuthenticated().token}`,
+			},
+		})
+			.then(R => R.json())
+			.then(resp => {
+				setVerified(resp.verified);
+			})
+			.catch(console.log);
+	};
+
+	useEffect(isVerified);
 
 	const errorMessage = () => {
 		return (
@@ -28,7 +47,10 @@ const UserDashboard = () => {
 		return (
 			loading && (
 				<div className="alert alert-info">
-					<h2>Loading...</h2>
+					<h2>
+						Please wait while we send an email to the email-address linked with
+						your account.
+					</h2>
 				</div>
 			)
 		);
@@ -59,7 +81,7 @@ const UserDashboard = () => {
 					<li>
 						<Link to="/delete-account">Permanently delete your account</Link>
 					</li>
-					{isAuthenticated().user.verified === false && (
+					{!verified && (
 						<li>
 							<Link
 								onClick={() => {
