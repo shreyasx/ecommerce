@@ -1,6 +1,12 @@
 const User = require("../models/user");
 const Order = require("../models/order");
 
+exports.deleteUser = (req, res) => {
+	User.deleteOne({ _id: req.params.userId })
+		.then(r => res.json("Account deleted successfully!"))
+		.catch(console.log);
+};
+
 exports.getUserById = (req, res, next, id) => {
 	User.findById(id).exec((err, user) => {
 		if (err || !user) {

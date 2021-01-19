@@ -1,12 +1,41 @@
-import React from "react";
-const Delete = () => (
-	<>
-		<h1 className="text-white">Are you sure?</h1>
-		<h2 className="text-white">We're sorry to see you go!</h2>
-		<button onClick={() => {}} className="btn btn-outline-danger">
-			PERMANENTLY DELETE ACCOUNT
-		</button>
-	</>
-);
+import React, { useState } from "react";
+import { isAuthenticated, signout } from "../auth/helper";
+import { API } from "../backend";
+
+const Delete = ({ history }) => {
+	const [loading, setLoading] = useState(false);
+	return (
+		<>
+			<h1 className="text-white">Are you sure?</h1>
+			<h2 className="text-white">We're sorry to see you go!</h2>
+			<button
+				onClick={() => {
+					setLoading(true);
+					fetch(`${API}/delete/${isAuthenticated().user._id}`, {
+						method: "GET",
+						headers: {
+							Accept: "application/json",
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${isAuthenticated().token}`,
+						},
+					})
+						.then(R => R.json())
+						.then(resp => {
+							console.log(resp);
+							if (resp === "Account deleted successfully!") {
+								signout(() => {
+									history.push("/");
+								});
+							}
+						})
+						.catch(console.log);
+				}}
+				className="btn btn-outline-danger"
+			>
+				PERMANENTLY DELETE ACCOUNT
+			</button>
+		</>
+	);
+};
 
 export default Delete;

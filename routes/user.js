@@ -6,6 +6,7 @@ const {
 	getUser,
 	updateUser,
 	userPurchaseList,
+	deleteUser,
 } = require("../controllers/user");
 const { isSignedIn, isAuthenticated, isAdmin } = require("../controllers/auth");
 
@@ -19,5 +20,6 @@ router.get(
 	isAuthenticated,
 	userPurchaseList
 );
+router.get("/delete/:userId", isSignedIn, isAuthenticated, deleteUser);
 
 module.exports = router;

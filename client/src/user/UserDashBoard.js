@@ -23,7 +23,7 @@ const UserDashboard = () => {
 					<li>
 						<Link to="/delete-account">Permanently delete your account</Link>
 					</li>
-					{isAuthenticated().user.verified == false && (
+					{isAuthenticated().user.verified === false && (
 						<li>
 							<Link to="/verify">Verify email address</Link>
 						</li>
