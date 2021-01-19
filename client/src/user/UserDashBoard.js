@@ -61,7 +61,7 @@ const UserDashboard = () => {
 	};
 
 	return (
-		<Base title="UserDashboard Page">
+		<Base title="User Dashboard">
 			{loadingMessage()}
 			{errorMessage()}
 			<h1 className="text-white">
@@ -75,9 +75,9 @@ const UserDashboard = () => {
 					<li>
 						<Link to="/reset-password">Reset password</Link>
 					</li>
-					<li>
+					{/* <li>
 						<Link to="/update-email">Update your account email</Link>
-					</li>
+					</li> */}
 					<li>
 						<Link to="/delete-account">Permanently delete your account</Link>
 					</li>

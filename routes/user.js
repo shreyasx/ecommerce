@@ -9,11 +9,11 @@ const {
 	deleteUser,
 	verify,
 	confirmationPost,
+	getStatus,
 } = require("../controllers/user");
 const { isSignedIn, isAuthenticated, isAdmin } = require("../controllers/auth");
 
 router.param("userId", getUserById);
-
 router.get("/user/:userId", isSignedIn, isAuthenticated, getUser);
 router.put("/user/:userId", isSignedIn, isAuthenticated, updateUser);
 router.get(
@@ -25,5 +25,7 @@ router.get(
 router.get("/delete/:userId", isSignedIn, isAuthenticated, deleteUser);
 router.get("/verify/:userId", isSignedIn, isAuthenticated, verify);
 router.get("/confirmation", confirmationPost);
+router.post("/update/:userId", isSignedIn, isAuthenticated, updateUser);
+router.get("/getStatus/:userId", isSignedIn, isAuthenticated, getStatus);
 
 module.exports = router;

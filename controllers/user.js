@@ -6,6 +6,17 @@ const Token = require("../models/Token");
 const { validationResult } = require("express-validator");
 const API = "http://localhost:8000/api";
 
+exports.getStatus = (req, res) => {
+	User.findOne({ _id: req.profile._id }, (er, user) => {
+		if (er || !user) {
+			console.log("aaaaaaaahhhhh");
+			return;
+		}
+		if (!user.encry_password) return res.json("linked");
+		res.json("not linked");
+	});
+};
+
 exports.confirmationPost = (req, res, next) => {
 	const errors = validationResult(req);
 	const { token } = req.query;
@@ -126,21 +137,16 @@ exports.getUser = (req, res) => {
 };
 
 exports.updateUser = (req, res) => {
-	User.findByIdAndUpdate(
-		{ _id: req.profile._id },
-		{ $set: req.body },
-		{ new: true, useFindAndModify: false },
-		(err, user) => {
-			if (err) {
-				res.status(400).json({
-					error: "YOU are not AUTHORISED to update this infornmation",
-				});
-			}
-			user.salt = undefined;
-			user.encry_password = undefined;
-			res.json(user);
+	const { password } = req.body;
+	User.findOne({ _id: req.profile._id }, (err, user) => {
+		if (err) {
+			return res.status(400).json({
+				error: "YOU are not AUTHORISED to update this infornmation",
+			});
 		}
-	);
+		user.password = password;
+		user.save().then(() => res.json("donee"));
+	});
 };
 
 exports.userPurchaseList = (req, res) => {
