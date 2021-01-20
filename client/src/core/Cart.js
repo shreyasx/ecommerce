@@ -62,10 +62,11 @@ const Cart = () => {
 				token,
 				product,
 			});
+			// console.log("addr- ", addresses);
 			emptyCart(() => {
-				console.log(isAuthenticated());
 				const data = JSON.stringify({
 					products,
+					addresses,
 					price: getPrice(),
 				});
 				fetch(`${API}/newOrder/${isAuthenticated().user._id}`, {
@@ -80,7 +81,6 @@ const Cart = () => {
 					.then(R => R.json())
 					.then(resp => {
 						setLoading(true);
-						console.log("rcdv frm sv ordr- ", resp);
 						(async () => {
 							const ps = await loadCart(isAuthenticated().user._id);
 							setProducts(ps);

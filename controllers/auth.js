@@ -67,20 +67,15 @@ exports.facebook = (req, res) => {
 					return;
 				}
 				if (use) {
-					res.json({ error: "user email already exists" });
+					res.json({ error: "An account with that email already exists." });
 					return;
 				}
 				const newUser = new User({ name, email, fb_id: userID });
 				newUser
 					.save()
 					.then(() => {
-						//create token
 						const token = jwt.sign({ _id: newUser._id }, process.env.SECRET);
-
-						//put token in cookie
 						res.cookie("token", token, { expire: new Date() + 99 });
-
-						//send response  to frontend
 						const { _id, name, email, role } = newUser;
 						return res.json({ token, user: { _id, name, email, role } });
 					})
