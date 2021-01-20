@@ -18,14 +18,14 @@ router.param("orderId", getOrderById);
 
 //Actual routes
 //create
-router.post(
-	"/order/create/:userId",
-	isSignedIn,
-	isAuthenticated,
-	pushOrderInPurchaseList,
-	updateStock,
-	createOrder
-);
+// router.post(
+// 	"/order/create/:userId",
+// 	isSignedIn,
+// 	isAuthenticated,
+// 	pushOrderInPurchaseList,
+// 	updateStock,
+// 	createOrder
+// );
 
 //read
 router.get(

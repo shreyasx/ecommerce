@@ -1,10 +1,10 @@
 const User = require("../models/user");
-const Order = require("../models/order");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const Token = require("../models/Token");
 const { validationResult } = require("express-validator");
 const API = "http://localhost:8000/api";
+const Order = require("../models/order");
 
 exports.getStatus = (req, res) => {
 	User.findOne({ _id: req.profile._id }, (er, user) => {
@@ -168,32 +168,16 @@ exports.userPurchaseList = (req, res) => {
 		});
 };
 
-exports.pushOrderInPurchaseList = (req, res, next) => {
-	let purchases = [];
-	req.body.order.products.forEach(product => {
-		purchases.push({
-			_id: product._id,
-			name: product.name,
-			description: product.description,
-			category: product.category,
-			quantity: product.quantity,
-			amount: req.body.order.amount,
-			transaction_id: req.body.order.transaction_id,
-		});
+exports.saveOrder = (req, res, next) => {
+	const { products, price } = req.body;
+	console.log(products, price);
+	const order = new Order();
+	order.products = products;
+	order.user = req.profile._id;
+	order.price = price;
+	order.save().then(() => {
+		console.log(order);
+		res.json("finee");
 	});
-
-	// Store this in DB
-	User.findOneAndUpdate(
-		{ _id: req.profile._id },
-		{ $push: { purchases } },
-		{ new: true },
-		(err, purchases) => {
-			if (err)
-				return res.status(400).json({
-					error: "Unable to save purchase list",
-				});
-			res.json(purchases);
-			next();
-		}
-	);
+	next();
 };

@@ -5,11 +5,26 @@ import Card from "./Card";
 import { loadCart } from "./helper/carthelper";
 import { isAuthenticated } from "../auth/helper";
 import { Link } from "react-router-dom";
+import StripeCheckout from "react-stripe-checkout";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
+import { emptyCart } from "./helper/carthelper";
+import { API } from "../backend";
+
+toast.configure();
 
 const Cart = () => {
 	const [products, setProducts] = useState([]);
 	const [reload, setReload] = useState(false);
 	const [loading, setLoading] = useState(true);
+	const [payLoading, setPayLoading] = useState(false);
+
+	const getPrice = () => {
+		var price = 0;
+		for (var i = 0; i < products.length; i++) price += products[i].price;
+		return price;
+	};
 
 	useEffect(() => {
 		(async () => {
@@ -39,7 +54,65 @@ const Cart = () => {
 			);
 	};
 
-	const loadCheckout = () => <h2>This Section for Checking out:</h2>;
+	const loadCheckout = () => {
+		const product = { price: getPrice(), user: isAuthenticated().user._id };
+		async function handleToken(token, addresses) {
+			setPayLoading(true);
+			const response = await axios.post("http://localhost:8000/api/checkout", {
+				token,
+				product,
+			});
+			emptyCart(() => {
+				const data = JSON.stringify({
+					products,
+					price: getPrice(),
+				});
+				fetch(`${API}/saveOrder/${isAuthenticated().user._id}`, {
+					method: "POST",
+					headers: {
+						Accept: "application/json",
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${isAuthenticated().token}`,
+					},
+					body: JSON.stringify(data),
+				})
+					.then(R => R.json())
+					.then(resp => {
+						console.log(resp);
+						setPayLoading(false);
+					});
+			});
+			const { status } = response.data;
+			console.log("Response: ", response.data);
+			if (status === "success")
+				toast("Payment successful! Check email for details", {
+					type: "success",
+				});
+			else toast("Something went wrong", { type: "error" });
+		}
+
+		return (
+			<>
+				{payLoading ? (
+					<div className="alert alert-info">
+						<h2>Loading... Do not refresh the page.</h2>
+					</div>
+				) : (
+					<>
+						<h2>This Section for Checking out:</h2>
+						<StripeCheckout
+							stripeKey="pk_test_51IBXOSJZ5SfvqGzXiCyNg9KYR752jDXw1VmT0ZZJk4TtGnh0uioNCnLYWj1RMLPExNgyc5Py80yvr5zprsFQCdTp00MgYD5aGu"
+							token={handleToken}
+							amount={getPrice() * 100}
+							name="Products"
+							billingAddress
+							shippingAddress
+						/>
+					</>
+				)}
+			</>
+		);
+	};
 
 	return (
 		<Base title="Cart Page" description="Ready to checkout">
