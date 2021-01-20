@@ -63,27 +63,34 @@ const Cart = () => {
 				product,
 			});
 			emptyCart(() => {
+				console.log(isAuthenticated());
 				const data = JSON.stringify({
 					products,
 					price: getPrice(),
 				});
-				fetch(`${API}/saveOrder/${isAuthenticated().user._id}`, {
+				fetch(`${API}/newOrder/${isAuthenticated().user._id}`, {
 					method: "POST",
 					headers: {
 						Accept: "application/json",
 						"Content-Type": "application/json",
 						Authorization: `Bearer ${isAuthenticated().token}`,
 					},
-					body: JSON.stringify(data),
+					body: data,
 				})
 					.then(R => R.json())
 					.then(resp => {
-						console.log(resp);
+						setLoading(true);
+						console.log("rcdv frm sv ordr- ", resp);
+						(async () => {
+							const ps = await loadCart(isAuthenticated().user._id);
+							setProducts(ps);
+							setLoading(false);
+						})();
 						setPayLoading(false);
-					});
+					})
+					.catch(console.log);
 			});
 			const { status } = response.data;
-			console.log("Response: ", response.data);
 			if (status === "success")
 				toast("Payment successful! Check email for details", {
 					type: "success",
