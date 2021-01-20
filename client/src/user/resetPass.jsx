@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Base from "../core/Base";
 import { signin, isAuthenticated } from "../auth/helper";
-import { Redirect } from "react-router-dom";
 import { API } from "../backend";
 
 const ResetPassword = () => {
@@ -10,7 +9,7 @@ const ResetPassword = () => {
 	const [newP, setNew] = useState("");
 	const [newP2, setNew2] = useState("");
 	const [error, setError] = useState("");
-	const [redirect, setRedirect] = useState(false);
+	const [success, setSuccess] = useState(false);
 	const [status, setStatus] = useState("");
 
 	useEffect(() => {
@@ -30,8 +29,19 @@ const ResetPassword = () => {
 			.catch(console.log);
 	});
 
-	const performRedirect = () => {
-		if (redirect) return <Redirect to="/" />;
+	const successMessage = () => {
+		return (
+			<div className="row">
+				<div className="col-md-6 offset-sm-3 text-left">
+					<div
+						className="alert alert-success"
+						style={{ display: success ? "" : "none" }}
+					>
+						Password updated successfully.
+					</div>
+				</div>
+			</div>
+		);
 	};
 
 	const linked = () => {
@@ -49,7 +59,15 @@ const ResetPassword = () => {
 			body: JSON.stringify({ password: newP }),
 		})
 			.then(R => R.json())
-			.then(() => setRedirect(true))
+			.then(resp => {
+				if (resp.error) {
+					setError(resp.error);
+					setSuccess(false);
+					return;
+				}
+				setSuccess(true);
+				setError("");
+			})
 			.catch(console.log);
 	};
 
@@ -73,7 +91,15 @@ const ResetPassword = () => {
 					body: JSON.stringify({ password: newP }),
 				})
 					.then(R => R.json())
-					.then(() => setRedirect(true))
+					.then(resp => {
+						if (resp.error) {
+							setError(resp.error);
+							setSuccess(false);
+							return;
+						}
+						setSuccess(true);
+						setError("");
+					})
 					.catch(console.log);
 			}
 		});
@@ -114,6 +140,7 @@ const ResetPassword = () => {
 			<div className="row">
 				<div className="col-md-6 offset-sm-3 text-left">
 					{errorMessage()}
+					{successMessage()}
 					<form>
 						{status === "not linked" && (
 							<div className="form-group">
@@ -153,7 +180,6 @@ const ResetPassword = () => {
 					</form>
 				</div>
 			</div>
-			{performRedirect()}
 		</Base>
 	);
 };

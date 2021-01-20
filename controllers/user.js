@@ -138,12 +138,18 @@ exports.getUser = (req, res) => {
 
 exports.updateUser = (req, res) => {
 	const { password } = req.body;
+	if (password.length < 5)
+		return res.json({ error: "Password must be 5 or more characters." });
 	User.findOne({ _id: req.profile._id }, (err, user) => {
-		if (err) {
+		if (err || !user) {
 			return res.status(400).json({
 				error: "YOU are not AUTHORISED to update this infornmation",
 			});
 		}
+		if (user.authenticate(password))
+			return res.status(401).json({
+				error: "New password must be different from your existing password.",
+			});
 		user.password = password;
 		user.save().then(() => res.json("donee"));
 	});
@@ -154,7 +160,7 @@ exports.userPurchaseList = (req, res) => {
 		.populate("user", "_id name")
 		.exec((err, order) => {
 			if (err) {
-				res.status(400).json({
+				return res.status(400).json({
 					error: "NO Order in this account",
 				});
 			}
@@ -176,17 +182,17 @@ exports.pushOrderInPurchaseList = (req, res, next) => {
 		});
 	});
 
-	//Store this in DB
+	// Store this in DB
 	User.findOneAndUpdate(
 		{ _id: req.profile._id },
-		{ $push: { purchases: purchases } },
+		{ $push: { purchases } },
 		{ new: true },
 		(err, purchases) => {
-			if (err) {
+			if (err)
 				return res.status(400).json({
 					error: "Unable to save purchase list",
 				});
-			}
+			res.json(purchases);
 			next();
 		}
 	);
