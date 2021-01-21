@@ -55,13 +55,18 @@ const Cart = () => {
 	};
 
 	const loadCheckout = () => {
-		const product = { price: getPrice(), user: isAuthenticated().user._id };
+		const idList = products.map(prod => prod._id);
+		const product = {
+			price: getPrice(),
+			user: isAuthenticated().user._id,
+		};
 		async function handleToken(token, addresses) {
 			setPayLoading(true);
 			setLoading(true);
 			const response = await axios.post("http://localhost:8000/api/checkout", {
 				token,
 				product,
+				idList,
 			});
 			const { status, payment } = response.data;
 			if (status === "success") {

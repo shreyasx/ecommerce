@@ -5,20 +5,29 @@ const stripe = require("stripe")(
 );
 const uuid = require("uuid/v4");
 const Payment = require("../models/payments");
+const Product = require("../models/product");
 
 router.post("/checkout", async (req, res) => {
 	let error;
 	let status;
 	try {
-		const { product, token } = req.body;
+		const { product, idList, token } = req.body;
 		const customer = await stripe.customers.create({
 			email: token.email,
 			source: token.id,
 		});
 
+		idList.map(_id => {
+			Product.find({ _id }, (er, prod) => {
+				prod.sold++;
+				prod.stock--;
+				prod.save();
+			});
+		});
+
 		const idempotencyKey = uuid();
 		const stripeOptions = {
-			amount: product.price * 100,
+			amount: product.price,
 			currency: "inr",
 			customer: customer.id,
 			receipt_email: token.email,
