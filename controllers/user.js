@@ -76,23 +76,26 @@ const createToken = userID => {
 const transporter = nodemailer.createTransport({
 	service: "gmail",
 	auth: {
-		user: "2gi19cs140@students.git.edu",
-		pass: "hupfwsmwznwchtsf",
+		user: process.env.NODEMAILER_EMAIL,
+		pass: process.env.NODEMAILER_PASS,
 	},
 });
 
 const sendMail = (user, res) => {
 	var mailOptions = {
-		from: "shreyxs@gmail.com",
+		from: process.env.NODEMAILER_EMAIL,
 		to: user.email,
 		subject: "Account Verification Token",
 		text:
-			`Hello ${user.name},\n\n` +
-			"Please verify your account by clicking the link: \nhttp://" +
+			`Hey ${user.name},\n\n` +
+			"I'm Shreyas, the owner of Extreme Gaming Store. If you didn't " +
+			"create an account on my website, please ignore this mail.\n" +
+			"However, if you did, you can verify your account by clicking the link: \n" +
 			API +
 			"/confirmation?token=" +
 			createToken(user.id) +
-			"\n",
+			"\nYou can reply to this mail for any queries." +
+			"\n\nRegards\nShreyas Jamkhandi",
 	};
 	transporter.sendMail(mailOptions, function (err, msg) {
 		if (err) {

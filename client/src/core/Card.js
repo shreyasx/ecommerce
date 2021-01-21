@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import Imagehelper from "./helper/Imagehelper";
-import { Link, Redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { addItemToCart, removeItemFromCart } from "./helper/carthelper";
 import { isAuthenticated } from "../auth/helper";
+import { toast } from "react-toastify";
 
 const Card = ({
 	cart,
@@ -12,22 +13,21 @@ const Card = ({
 	setReload = f => f,
 	reload = undefined,
 }) => {
-	const [redirect, setRedirect] = useState(false);
-
 	const cardTitle = product ? product.name : "A photo from pexels";
 	const cardDescription = product ? product.descripton : "DEFAULT description";
 	const cardPrice = product ? product.price : "5";
 
 	const addToCart = () => {
-		addItemToCart(product, () => {
-			setRedirect(true);
+		addItemToCart(product, res => {
+			if (res)
+				toast("Item added to cart!", {
+					type: "success",
+				});
+			else
+				toast("Item already exists in cart!", {
+					type: "error",
+				});
 		});
-	};
-
-	const getARedirect = redir => {
-		if (redir) {
-			return <Redirect to="/cart" />;
-		}
 	};
 
 	const showAddToCart = () => {
@@ -76,7 +76,6 @@ const Card = ({
 		>
 			<div className="card-header lead">{cardTitle}</div>
 			<div className="card-body">
-				{getARedirect(redirect)}
 				<Imagehelper product={product} />
 				<p className="lead bg-success font-weight-normal text-wrap">
 					{cardDescription}
@@ -95,7 +94,6 @@ const Card = ({
 		>
 			<div className="card-header lead">{cardTitle}</div>
 			<div className="card-body">
-				{getARedirect(redirect)}
 				<Imagehelper product={product} />
 				<p className="lead bg-success font-weight-normal text-wrap">
 					{cardDescription}

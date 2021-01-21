@@ -35,7 +35,7 @@ const Purchases = () => {
 	};
 
 	return (
-		<Base title="All Purchases">
+		<Base title="All Purchases" description="View all orders made in the past">
 			{loading ? (
 				<img
 					style={{ width: "200px" }}

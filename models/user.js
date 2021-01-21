@@ -11,11 +11,6 @@ var userSchema = new mongoose.Schema(
 			trim: true,
 		},
 		verified: { type: Boolean, default: true, required: true },
-		lastname: {
-			type: String,
-			maxlength: 32,
-			trim: true,
-		},
 		email: {
 			type: String,
 			required: true,
@@ -32,10 +27,6 @@ var userSchema = new mongoose.Schema(
 		role: {
 			type: Number,
 			default: 0,
-		},
-		purchases: {
-			type: Array,
-			default: [],
 		},
 	},
 	{ timestamps: true }

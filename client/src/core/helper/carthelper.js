@@ -13,9 +13,8 @@ export const addItemToCart = (item, next) => {
 		},
 		body: data,
 	})
-		.then(r => {
-			next();
-		})
+		.then(r => r.json())
+		.then(resp => next(resp))
 		.catch(console.log);
 };
 

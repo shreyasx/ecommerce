@@ -133,7 +133,7 @@ const Cart = () => {
 	};
 
 	return (
-		<Base title="Cart Page" description="Ready to checkout">
+		<Base title="Your Cart" description="Ready to checkout">
 			<div className="row text-white">
 				{!isAuthenticated().user ? (
 					<h6>

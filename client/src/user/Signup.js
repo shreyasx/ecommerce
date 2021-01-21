@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import Base from "../core/Base";
-import { Link } from "react-router-dom";
 import { signup } from "../auth/helper";
 import FacebookLogin from "react-facebook-login";
 import { API } from "../backend";
+import { toast } from "react-toastify";
 import { authenticate, signin, isAuthenticated } from "../auth/helper";
 import { Redirect } from "react-router-dom";
 // import FacebookLogin from "react-facebook-login/dist/facebook-login-render-props";
@@ -14,64 +14,46 @@ const Signup = () => {
 		name: "",
 		email: "",
 		password: "",
-		error: "",
-		success: false,
 		loading: false,
 		didRedirect: false,
 	});
 
-	const {
-		name,
-		email,
-		password,
-		error,
-		success,
-		loading,
-		didRedirect,
-	} = values;
+	const { name, email, password, loading, didRedirect } = values;
 	const { user } = isAuthenticated();
 
 	const handleChange = name => event => {
-		setValues({ ...values, error: false, [name]: event.target.value });
+		setValues({ ...values, [name]: event.target.value });
 	};
 
 	const onSubmit = event => {
 		event.preventDefault();
-		setValues({ ...values, error: false });
 		signup({ name, email, password })
 			.then(data => {
 				if (data.error) {
-					setValues({ ...values, error: data.error, success: false });
-				} else {
-					setValues({
-						...values,
-						name: "",
-						email: "",
-						password: "",
-						error: "",
-						success: true,
-					});
-				}
-				signin({ email, password })
-					.then(data => {
-						if (data.error === "Email and password do not match") {
-							setValues({
-								...values,
-								error: "An account with that email already exists.",
-								loading: false,
-							});
-						} else {
-							authenticate(data, () => {
+					toast(data.error, { type: "error" });
+				} else
+					signin({ email, password })
+						.then(dat => {
+							if (dat.error) {
 								setValues({
 									...values,
-									didRedirect: true,
+									loading: false,
 								});
-							});
-						}
-					})
-					.catch(er => {
-						console.log("Signin request failed");
-					});
+								toast(data.error, {
+									type: "error",
+								});
+							} else {
+								authenticate(dat, () => {
+									setValues({
+										...values,
+										didRedirect: true,
+									});
+								});
+							}
+						})
+						.catch(er => {
+							console.log("Signin request failed");
+						});
 			})
 			.catch(er => {
 				console.log("Error in signup");
@@ -161,7 +143,8 @@ const Signup = () => {
 			.then(r => r.json())
 			.then(data => {
 				if (data.error) {
-					setValues({ ...values, error: data.error, loading: false });
+					setValues({ ...values, loading: false });
+					toast(data.error, { type: "error" });
 				} else {
 					authenticate(data, () => {
 						setValues({
@@ -177,7 +160,7 @@ const Signup = () => {
 	};
 
 	const componentClicked = () => {
-		setValues({ ...values, error: false, loading: true });
+		setValues({ ...values, loading: true });
 	};
 
 	const responseFacebook = response => {
@@ -193,7 +176,8 @@ const Signup = () => {
 			.then(r => r.json())
 			.then(data => {
 				if (data.error) {
-					setValues({ ...values, error: data.error, loading: false });
+					setValues({ ...values, loading: false });
+					toast(data.error, { type: "error" });
 				} else {
 					authenticate(data, () => {
 						setValues({
@@ -232,45 +216,12 @@ const Signup = () => {
 		}
 	};
 
-	const successMessage = () => {
-		return (
-			<div className="row">
-				<div className="col-md-6 offset-sm-3 text-left">
-					<div
-						className="alert alert-success"
-						style={{ display: success ? "" : "none" }}
-					>
-						New account was created successfully. Please
-						<Link to="/signin">Login Here</Link>
-					</div>
-				</div>
-			</div>
-		);
-	};
-
-	const errorMessage = () => {
-		return (
-			<div className="row">
-				<div className="col-md-6 offset-sm-3 text-left">
-					<div
-						className="alert alert-danger"
-						style={{ display: error ? "" : "none" }}
-					>
-						{error}
-					</div>
-				</div>
-			</div>
-		);
-	};
-
 	return (
 		<Base
-			title="Signup Page"
-			description="Signup now to be able to save games in your cart!"
+			title="Signup to Extreme Game Store"
+			description="Signup now to be able to buy your favourite games!"
 		>
 			{loadingMessage()}
-			{successMessage()}
-			{errorMessage()}
 			{signupForm()}
 			{performRedirect()}
 		</Base>

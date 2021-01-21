@@ -4,7 +4,7 @@ import Base from "../core/Base";
 
 const Verify = () => {
 	return (
-		<Base title="Verification Page" description="">
+		<Base title="Account Verification Page" description="">
 			<h2 className="text-white">{`An email has been sent to ${
 				isAuthenticated().user.email
 			}, follow the link mentioned to verify your account.`}</h2>

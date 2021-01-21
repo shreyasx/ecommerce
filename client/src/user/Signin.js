@@ -5,6 +5,7 @@ import { signin, authenticate, isAuthenticated } from "../auth/helper";
 import FacebookLogin from "react-facebook-login";
 import { API } from "../backend";
 import { GoogleLogin } from "react-google-login";
+import { toast } from "react-toastify";
 
 const Signin = () => {
 	const [values, setValues] = useState({
@@ -24,11 +25,12 @@ const Signin = () => {
 
 	const onSubmit = event => {
 		event.preventDefault();
-		setValues({ ...values, error: false, loading: true });
+		setValues({ ...values, loading: true });
 		signin({ email, password })
 			.then(data => {
 				if (data.error) {
-					setValues({ ...values, error: data.error, loading: false });
+					setValues({ ...values, loading: false });
+					toast(data.error, { type: "error" });
 				} else {
 					authenticate(data, () => {
 						setValues({
@@ -146,7 +148,13 @@ const Signin = () => {
 			.then(r => r.json())
 			.then(data => {
 				if (data.error) {
-					setValues({ ...values, error: data.error, loading: false });
+					setValues({
+						...values,
+						error:
+							"An account already exists with that email, but you cannot use your " +
+							"Google account to sign in. Please enter your password.",
+						loading: false,
+					});
 				} else {
 					authenticate(data, () => {
 						setValues({
@@ -178,7 +186,13 @@ const Signin = () => {
 			.then(r => r.json())
 			.then(data => {
 				if (data.error) {
-					setValues({ ...values, error: data.error, loading: false });
+					setValues({
+						...values,
+						error:
+							"An account already exists with that email, but you cannot use your " +
+							"Facebook account to sign in. Please enter your password.",
+						loading: false,
+					});
 				} else {
 					authenticate(data, () => {
 						setValues({
@@ -194,10 +208,7 @@ const Signin = () => {
 	};
 
 	return (
-		<Base
-			title="Signin Page"
-			description="Signin to your account and add your favourite games to your cart!"
-		>
+		<Base title="Signin" description="Signin to your account to make orders!">
 			{loadingMessage()}
 			{errorMessage()}
 			{signinForm()}

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Base from "../core/Base";
 import { isAuthenticated } from "../auth/helper";
-import { Link, Redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { API } from "../backend";
+import { toast } from "react-toastify";
 
 const UserDashboard = () => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(false);
-	const [redirect, setRedirect] = useState(false);
 	const [verified, setVerified] = useState(true);
 
 	const isVerified = () => {
@@ -56,10 +56,6 @@ const UserDashboard = () => {
 		);
 	};
 
-	const performRedirect = () => {
-		if (redirect) return <Redirect to="/verify" />;
-	};
-
 	return (
 		<Base title="User Dashboard">
 			{loadingMessage()}
@@ -100,7 +96,10 @@ const UserDashboard = () => {
 												setError(resp.error);
 												return;
 											}
-											setRedirect(true);
+											toast(
+												"A mail has been sent your email address with a link verify your account.",
+												{ type: "success" }
+											);
 											setLoading(false);
 										})
 										.catch(console.log);
@@ -112,7 +111,6 @@ const UserDashboard = () => {
 					)}
 				</ul>
 			</div>
-			{performRedirect()}
 		</Base>
 	);
 };

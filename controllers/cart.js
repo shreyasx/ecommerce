@@ -20,9 +20,15 @@ const addToCart = (req, res) => {
 				res.json(true);
 			});
 		} else {
+			for (var i = 0; i < cart.products.length; i++) {
+				if (cart.products[i]._id == product._id) {
+					res.json(false);
+					return;
+				}
+			}
 			cart.products.push(product);
-			cart.save((er, result) => {
-				if (er) {
+			cart.save((errr, result) => {
+				if (errr) {
 					console.log(er);
 					res.status(400);
 					return;
