@@ -13,12 +13,12 @@ exports.getCategories = (req, res) => {
 
 exports.getProducts = (req, res) => {
 	const { categ } = req.query;
-	Category.findOne({ name: categ }, (er, category) => {
+	Category.findOne({ _id: categ }, (er, category) => {
 		Product.find({ category: category._id }, (err, prods) => {
 			res.json(
 				prods.map(p => {
-					const { name, price, _id } = p;
-					return { name, price, _id };
+					const { name, price, _id, stock } = p;
+					return { name, price, _id, stock };
 				})
 			);
 		});

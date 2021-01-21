@@ -145,8 +145,12 @@ exports.getAllProducts = (req, res) => {
 					error: "NO product found in DB",
 				});
 			}
-			// const resp = products.filter(prod => prod.stock > 0);
-			res.json(products);
+			const old = [...products];
+			const n = 6;
+			const result = new Array(Math.ceil(products.length / n))
+				.fill()
+				.map(_ => products.splice(0, n));
+			res.json(old);
 		});
 };
 

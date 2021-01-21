@@ -87,7 +87,7 @@ export default function Home() {
 											"btn-outline-success"
 										);
 										document.activeElement.classList.add("btn-success");
-										categoryChange(c.name);
+										categoryChange(c._id);
 									}}
 								>
 									{c.name}
