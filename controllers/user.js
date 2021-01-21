@@ -5,6 +5,7 @@ const Token = require("../models/Token");
 const { validationResult } = require("express-validator");
 const API = "http://localhost:8000/api";
 const Order = require("../models/order");
+const Cart = require("../models/cart");
 
 exports.getStatus = (req, res) => {
 	User.findOne({ _id: req.profile._id }, (er, user) => {
@@ -114,7 +115,11 @@ exports.verify = (req, res) => {
 
 exports.deleteUser = (req, res) => {
 	User.deleteOne({ _id: req.profile._id })
-		.then(r => res.json("Account deleted successfully!"))
+		.then(r => {
+			Cart.deleteOne({ user: req.profile._id }).then(re =>
+				res.json("Account deleted successfully!")
+			);
+		})
 		.catch(console.log);
 };
 

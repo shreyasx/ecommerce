@@ -129,57 +129,59 @@ const ResetPassword = () => {
 		);
 	};
 
-	return loading ? (
-		<img
-			style={{ width: "200px" }}
-			src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Youtube_loading_symbol_1_(wobbly).gif"
-			alt="loading"
-		/>
-	) : (
+	return (
 		<Base title="Reset Password" description="">
-			<div className="row">
-				<div className="col-md-6 offset-sm-3 text-left">
-					{errorMessage()}
-					{successMessage()}
-					<form>
-						{status === "not linked" && (
+			{loading ? (
+				<img
+					style={{ width: "200px" }}
+					src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Youtube_loading_symbol_1_(wobbly).gif"
+					alt="loading"
+				/>
+			) : (
+				<div className="row">
+					<div className="col-md-6 offset-sm-3 text-left">
+						{errorMessage()}
+						{successMessage()}
+						<form>
+							{status === "not linked" && (
+								<div className="form-group">
+									<label className="text-light">Current password</label>
+									<input
+										onChange={ev => {
+											setCurrent(ev.target.value);
+										}}
+										className="form-control"
+										type="password"
+									/>
+								</div>
+							)}
 							<div className="form-group">
-								<label className="text-light">Current password</label>
+								<label className="text-light">New password</label>
 								<input
 									onChange={ev => {
-										setCurrent(ev.target.value);
+										setNew(ev.target.value);
 									}}
 									className="form-control"
 									type="password"
 								/>
 							</div>
-						)}
-						<div className="form-group">
-							<label className="text-light">New password</label>
-							<input
-								onChange={ev => {
-									setNew(ev.target.value);
-								}}
-								className="form-control"
-								type="password"
-							/>
-						</div>
-						<div className="form-group">
-							<label className="text-light">New password (again)</label>
-							<input
-								onChange={ev => {
-									setNew2(ev.target.value);
-								}}
-								className="form-control"
-								type="password"
-							/>
-						</div>
-						<button onClick={onSubmit} className="btn btn-success btn-block">
-							Submit
-						</button>
-					</form>
+							<div className="form-group">
+								<label className="text-light">New password (again)</label>
+								<input
+									onChange={ev => {
+										setNew2(ev.target.value);
+									}}
+									className="form-control"
+									type="password"
+								/>
+							</div>
+							<button onClick={onSubmit} className="btn btn-success btn-block">
+								Submit
+							</button>
+						</form>
+					</div>
 				</div>
-			</div>
+			)}
 		</Base>
 	);
 };

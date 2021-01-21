@@ -6,8 +6,6 @@ const stripe = require("stripe")(
 const uuid = require("uuid/v4");
 const Payment = require("../models/payments");
 
-const { isSignedIn, isAuthenticated } = require("../controllers/auth");
-
 router.post("/checkout", async (req, res) => {
 	let error;
 	let status;
@@ -40,16 +38,16 @@ router.post("/checkout", async (req, res) => {
 			idempotencyKey,
 		});
 		status = "success";
-		const pay = new Payment();
-		pay.user = product.user;
-		pay.options = stripeOptions;
-		pay.charge = charge;
-		pay.save().then(() => {
-			console.log("Saved in DB");
-			res.json({ error, status });
+		const payment = new Payment();
+		payment.user = product.user;
+		payment.options = stripeOptions;
+		payment.charge = charge;
+		payment.save((er, result) => {
+			if (er) return res.json({ error, status });
+			res.json({ error, status, payment: result._id });
 		});
 	} catch (err) {
-		console.error("Error: ", err);
+		console.error("Error making payment: ", err);
 		status = "failure";
 		res.json({ error, status });
 	}

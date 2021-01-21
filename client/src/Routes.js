@@ -14,10 +14,10 @@ import ManageProducts from "./admin/ManageProducts";
 import UpdateProduct from "./admin/UpdateProduct";
 import UpdateCategory from "./admin/UpdateCategory";
 import Cart from "./core/Cart";
-import AboutUs from "./core/AboutUs";
 import Delete from "./core/delete";
 import Verify from "./user/verify";
 import ResetPassword from "./user/resetPass";
+import Purchases from "./user/purchases";
 
 const Routes = () => {
 	return (
@@ -27,9 +27,9 @@ const Routes = () => {
 				<Route path="/signup" exact component={Signup} />
 				<Route path="/signin" exact component={Signin} />
 				<Route path="/cart" exact component={Cart} />
-				<Route path="/about" exact component={AboutUs} />
 				<Route path="/verify" exact component={Verify} />
 				<PrivateRoute path="/reset-password" exact component={ResetPassword} />
+				<PrivateRoute path="/purchases" exact component={Purchases} />
 				<Route path="/delete-account" exact component={Delete} />
 				<PrivateRoute path="/user/dashboard" exact component={UserDashboard} />
 				<AdminRoute path="/admin/dashboard" exact component={AdminDashboard} />

@@ -58,52 +58,58 @@ const Cart = () => {
 		const product = { price: getPrice(), user: isAuthenticated().user._id };
 		async function handleToken(token, addresses) {
 			setPayLoading(true);
+			setLoading(true);
 			const response = await axios.post("http://localhost:8000/api/checkout", {
 				token,
 				product,
 			});
-			// console.log("addr- ", addresses);
-			emptyCart(() => {
-				const data = JSON.stringify({
-					products,
-					addresses,
-					price: getPrice(),
-				});
-				fetch(`${API}/newOrder/${isAuthenticated().user._id}`, {
-					method: "POST",
-					headers: {
-						Accept: "application/json",
-						"Content-Type": "application/json",
-						Authorization: `Bearer ${isAuthenticated().token}`,
-					},
-					body: data,
-				})
-					.then(R => R.json())
-					.then(resp => {
-						setLoading(true);
-						(async () => {
-							const ps = await loadCart(isAuthenticated().user._id);
-							setProducts(ps);
-							setLoading(false);
-						})();
-						setPayLoading(false);
+			const { status, payment } = response.data;
+			if (status === "success") {
+				emptyCart(() => {
+					const data = JSON.stringify({
+						products,
+						addresses,
+						payment,
+						price: getPrice(),
+					});
+					fetch(`${API}/newOrder/${isAuthenticated().user._id}`, {
+						method: "POST",
+						headers: {
+							Accept: "application/json",
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${isAuthenticated().token}`,
+						},
+						body: data,
 					})
-					.catch(console.log);
-			});
-			const { status } = response.data;
-			if (status === "success")
+						.then(R => R.json())
+						.then(resp => {
+							(async () => {
+								const ps = await loadCart(isAuthenticated().user._id);
+								setProducts(ps);
+								setLoading(false);
+							})();
+							setPayLoading(false);
+						})
+						.catch(console.log);
+				});
 				toast("Payment successful! Check email for details", {
 					type: "success",
 				});
-			else toast("Something went wrong", { type: "error" });
+			} else {
+				toast("Something went wrong, please try again", { type: "error" });
+				setLoading(false);
+				setPayLoading(true);
+			}
 		}
 
 		return (
 			<>
 				{payLoading ? (
 					<div className="alert alert-info">
-						<h2>Loading... Do not refresh the page.</h2>
+						<h2>Loading... Do not close or refresh the page.</h2>
 					</div>
+				) : products.length === 0 ? (
+					<h2>Add products to checkout!</h2>
 				) : (
 					<>
 						<h2>This Section for Checking out:</h2>
