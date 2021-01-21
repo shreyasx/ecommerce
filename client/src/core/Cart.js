@@ -103,7 +103,7 @@ const Cart = () => {
 			} else {
 				toast("Something went wrong, please try again", { type: "error" });
 				setLoading(false);
-				setPayLoading(true);
+				setPayLoading(false);
 			}
 		}
 

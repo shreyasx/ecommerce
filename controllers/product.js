@@ -133,7 +133,7 @@ exports.updateProduct = (req, res) => {
 
 //product listing
 exports.getAllProducts = (req, res) => {
-	let sortBy = req.query.sortBy ? (sortBy = req.query.sortBy) : "_id";
+	let sortBy = req.query.sortBy ? req.query.sortBy : "_id";
 
 	Product.find()
 		.select("-photo")
@@ -145,6 +145,7 @@ exports.getAllProducts = (req, res) => {
 					error: "NO product found in DB",
 				});
 			}
+			// const resp = products.filter(prod => prod.stock > 0);
 			res.json(products);
 		});
 };

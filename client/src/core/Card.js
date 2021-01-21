@@ -31,6 +31,7 @@ const Card = ({
 	};
 
 	const showAddToCart = () => {
+		console.log(product);
 		return (
 			addtoCart &&
 			(isAuthenticated() ? (
@@ -81,7 +82,7 @@ const Card = ({
 				<p className="lead bg-success font-weight-normal text-wrap">
 					{cardDescription}
 				</p>
-				<p className="btn btn-success rounded  btn-sm px-4">$ {cardPrice}</p>
+				<p className="btn btn-success rounded  btn-sm px-4">₹{cardPrice}</p>
 				<div className="row">
 					<div className="col-12">{showAddToCart()}</div>
 					<div className="col-12">{showRemoveFromCart()}</div>
@@ -100,9 +101,13 @@ const Card = ({
 				<p className="lead bg-success font-weight-normal text-wrap">
 					{cardDescription}
 				</p>
-				<p className="btn btn-success rounded  btn-sm px-4">$ {cardPrice}</p>
+				<p className="btn btn-success rounded  btn-sm px-4">₹{cardPrice}</p>
 				<div className="row">
-					<div className="col-12">{showAddToCart()}</div>
+					{product.stock > 0 ? (
+						<div className="col-12">{showAddToCart()}</div>
+					) : (
+						<p className="btn btn-block btn-danger mt-2 mb-2">Out of stock</p>
+					)}
 					<div className="col-12">{showRemoveFromCart()}</div>
 				</div>
 			</div>

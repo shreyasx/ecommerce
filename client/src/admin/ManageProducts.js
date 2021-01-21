@@ -6,6 +6,7 @@ import { getProducts, deleteProduct } from "./helper/adminapicall";
 
 const ManageProducts = () => {
 	const [products, setProducts] = useState([]);
+	const [loading, setLoading] = useState(true);
 
 	const { user, token } = isAuthenticated();
 
@@ -15,6 +16,7 @@ const ManageProducts = () => {
 				console.log(data.error);
 			} else {
 				setProducts(data);
+				setLoading(false);
 			}
 		});
 	};
@@ -41,7 +43,13 @@ const ManageProducts = () => {
 			</Link>
 			<div className="row">
 				<div className="col-12">
-					<h2 className="text-center text-white my-3">Total 3 products</h2>
+					{loading ? (
+						<h2 className="text-center text-white my-3">Loading products...</h2>
+					) : (
+						<h2 className="text-center text-white my-3">
+							{products.length} Products found.
+						</h2>
+					)}
 					{products.map((product, index) => (
 						<div key={index} className="row text-center mb-2 ">
 							<div className="col-4">

@@ -18,7 +18,7 @@ router.post("/checkout", async (req, res) => {
 		});
 
 		idList.map(_id => {
-			Product.find({ _id }, (er, prod) => {
+			Product.findOne({ _id }, (er, prod) => {
 				prod.sold++;
 				prod.stock--;
 				prod.save();
@@ -27,7 +27,7 @@ router.post("/checkout", async (req, res) => {
 
 		const idempotencyKey = uuid();
 		const stripeOptions = {
-			amount: product.price,
+			amount: product.price * 100,
 			currency: "inr",
 			customer: customer.id,
 			receipt_email: token.email,

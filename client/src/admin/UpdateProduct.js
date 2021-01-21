@@ -39,7 +39,7 @@ const UpdateProduct = ({ match }) => {
 
 	const preload = productId => {
 		getProduct(productId).then(data => {
-			//console.log(data)
+			console.log("prod found- ", data);
 			if (data.error) {
 				setValues({ ...values, error: data.error });
 			} else {
@@ -70,7 +70,7 @@ const UpdateProduct = ({ match }) => {
 		});
 	};
 
-	useEffect(preload, []);
+	useEffect(() => preload(match.params.productId), []);
 
 	const handleChange = name => event => {
 		const value = name === "photo" ? event.target.files[0] : event.target.value;
