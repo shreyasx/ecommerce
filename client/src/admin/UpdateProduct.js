@@ -25,6 +25,8 @@ const UpdateProduct = ({ match }) => {
 		getaRedirect: false,
 		formData: "",
 	});
+	const [performPreload, setPerformPreload] = useState(true);
+	const [dataArrived, setDataArrived] = useState(false);
 
 	const {
 		name,
@@ -38,23 +40,26 @@ const UpdateProduct = ({ match }) => {
 	} = values;
 
 	const preload = productId => {
-		getProduct(productId).then(data => {
-			console.log("prod found- ", data);
-			if (data.error) {
-				setValues({ ...values, error: data.error });
-			} else {
-				preloadCategories();
-				setValues({
-					...values,
-					name: data.name,
-					description: data.description,
-					price: data.price,
-					category: data.category._id,
-					stock: data.stock,
-					formData: new FormData(),
-				});
-			}
-		});
+		if (performPreload)
+			getProduct(productId).then(data => {
+				if (data.error) {
+					setValues({ ...values, error: data.error });
+					setPerformPreload(false);
+				} else {
+					preloadCategories();
+					setValues({
+						...values,
+						name: data.name,
+						description: data.description,
+						price: data.price,
+						category: data.category._id,
+						stock: data.stock,
+						formData: new FormData(),
+					});
+					setPerformPreload(false);
+				}
+				setDataArrived(true);
+			});
 	};
 
 	const preloadCategories = () => {
@@ -70,7 +75,7 @@ const UpdateProduct = ({ match }) => {
 		});
 	};
 
-	useEffect(() => preload(match.params.productId), []);
+	useEffect(() => preload(match.params.productId));
 
 	const handleChange = name => event => {
 		const value = name === "photo" ? event.target.files[0] : event.target.value;
@@ -80,6 +85,7 @@ const UpdateProduct = ({ match }) => {
 
 	const onSubmit = event => {
 		event.preventDefault();
+		setDataArrived(false);
 		setValues({ ...values, error: "", loading: true });
 		updateProduct(match.params.productId, user._id, token, formData).then(
 			data => {
@@ -97,6 +103,7 @@ const UpdateProduct = ({ match }) => {
 						createdProduct: data.name,
 					});
 				}
+				setDataArrived(true);
 			}
 		);
 	};
@@ -208,7 +215,15 @@ const UpdateProduct = ({ match }) => {
 				<div className="col-md-8 offset-md-2">
 					{successMessage()}
 					{errorMessage()}
-					{createProductForm()}
+					{dataArrived ? (
+						createProductForm()
+					) : (
+						<img
+							style={{ width: "200px" }}
+							src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Youtube_loading_symbol_1_(wobbly).gif"
+							alt="loading"
+						/>
+					)}
 				</div>
 			</div>
 		</Base>

@@ -31,7 +31,6 @@ const Card = ({
 	};
 
 	const showAddToCart = () => {
-		console.log(product);
 		return (
 			addtoCart &&
 			(isAuthenticated() ? (

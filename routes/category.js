@@ -20,6 +20,10 @@ const {
 //params
 router.param("userId", getUserById);
 router.param("categoryId", getCategoryById);
+router.param("newName", (req, res, next, name) => {
+	req.newCategoryName = name;
+	next();
+});
 
 //actual routes
 
@@ -37,8 +41,8 @@ router.get("/category/:categoryId", getCategory);
 router.get("/categories", getAllCategory);
 
 //update
-router.put(
-	"/category/:categoryId/:userId",
+router.get(
+	"/category/:categoryId/:userId/:newName",
 	isSignedIn,
 	isAuthenticated,
 	isAdmin,

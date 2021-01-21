@@ -10,18 +10,25 @@ const UpdateCategory = ({ match }) => {
 	const [name, setName] = useState("");
 	const [error, setError] = useState(false);
 	const [success, setSuccess] = useState(false);
+	const [performPreload, setPerformPreload] = useState(true);
+	const [dataArrived, setDataArrived] = useState(false);
 
 	const preload = categoryId => {
-		getCategory(categoryId).then(data => {
-			if (data.error) {
-				setError(data.error);
-			} else {
-				setName(data.name);
-			}
-		});
+		if (performPreload)
+			getCategory(categoryId).then(data => {
+				console.log("pre ", data);
+				if (data.error) {
+					setError(data.error);
+					setPerformPreload(false);
+				} else {
+					setName(data.name);
+					setPerformPreload(false);
+				}
+				setDataArrived(true);
+			});
 	};
 
-	useEffect(preload, []);
+	useEffect(() => preload(match.params.categoryId));
 
 	const goBack = () => (
 		<div className="mt-5">
@@ -38,6 +45,7 @@ const UpdateCategory = ({ match }) => {
 
 	const onSubmit = event => {
 		event.preventDefault();
+		setDataArrived(false);
 		setError("");
 		setSuccess(false);
 
@@ -51,6 +59,7 @@ const UpdateCategory = ({ match }) => {
 					setSuccess(true);
 					setName("");
 				}
+				setDataArrived(true);
 			}
 		);
 	};
@@ -97,7 +106,15 @@ const UpdateCategory = ({ match }) => {
 				<div className="col-md-8 offset-md-2">
 					{successMessage()}
 					{warningMessage()}
-					{myCategoryForm()}
+					{dataArrived ? (
+						myCategoryForm()
+					) : (
+						<img
+							style={{ width: "200px" }}
+							src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Youtube_loading_symbol_1_(wobbly).gif"
+							alt="loading"
+						/>
+					)}
 					{goBack()}
 				</div>
 			</div>

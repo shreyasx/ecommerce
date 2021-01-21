@@ -47,7 +47,7 @@ const ManageProducts = () => {
 						<h2 className="text-center text-white my-3">Loading products...</h2>
 					) : (
 						<h2 className="text-center text-white my-3">
-							{products.length} Products found.
+							{products.length} products found.
 						</h2>
 					)}
 					{products.map((product, index) => (

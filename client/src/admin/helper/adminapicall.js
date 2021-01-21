@@ -56,14 +56,11 @@ export const deleteCategory = (categoryId, userId, token) => {
 
 //Update a category
 export const updateCategory = (categoryId, userId, token, category) => {
-	return fetch(`${API}/category/${categoryId}/${userId}`, {
-		method: "PUT",
+	return fetch(`${API}/category/${categoryId}/${userId}/${category}`, {
+		method: "GET",
 		headers: {
-			Accept: "application/json",
-			"Content-Type": "application/json",
 			Authorization: `Bearer ${token}`,
 		},
-		body: category,
 	})
 		.then(response => {
 			return response.json();
