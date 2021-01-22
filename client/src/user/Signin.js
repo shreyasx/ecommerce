@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Base from "../core/Base";
-import { Redirect } from "react-router-dom";
+import { Redirect, Link } from "react-router-dom";
 import { signin, authenticate, isAuthenticated } from "../auth/helper";
 import FacebookLogin from "react-facebook-login";
 import { API } from "../backend";
@@ -106,6 +106,11 @@ const Signin = () => {
 								className="form-control"
 								type="password"
 							></input>
+						</div>
+						<div style={{ margin: "20px auto", fontSize: "1.2em" }}>
+							<Link className="forgot" to="/forgot-password">
+								Don't remember your password?
+							</Link>
 						</div>
 						<button onClick={onSubmit} className="btn btn-success btn-block">
 							Submit

@@ -1,5 +1,7 @@
 var express = require("express");
 var router = express.Router();
+const cors = require("cors");
+
 const { check } = require("express-validator");
 const {
 	signout,
@@ -8,6 +10,7 @@ const {
 	isSignedIn,
 	facebook,
 	google,
+	forgotPassword,
 } = require("../controllers/auth");
 
 router.post(
@@ -35,5 +38,6 @@ router.post(
 );
 
 router.get("/signout", signout);
+router.post("/send-reset-password-link", cors(), forgotPassword);
 
 module.exports = router;

@@ -2,6 +2,73 @@ const User = require("../models/user");
 const { body, validationResult } = require("express-validator");
 var jwt = require("jsonwebtoken");
 var expressJwt = require("express-jwt");
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
+
+exports.forgotPassword = (req, res) => {
+	console.log("email- ", req.body.email);
+	User.findOne({ email: req.body.email }, (er, user) => {
+		if (er || !user) {
+			// res.json(true);
+			res.json("no u found");
+			return;
+		}
+		sendMail(user, res);
+	});
+};
+
+const createToken = userID => {
+	const tokenS = new Token({
+		userId: userID,
+		token: crypto.randomBytes(16).toString("hex"),
+	});
+	tokenS.save((err, response) => {
+		if (err) {
+			console.log("unable to save token in db.");
+			return;
+		}
+	});
+	return tokenS.token;
+};
+
+const transporter = nodemailer.createTransport({
+	service: "gmail",
+	auth: {
+		user: process.env.NODEMAILER_EMAIL,
+		pass: process.env.NODEMAILER_PASS,
+	},
+});
+
+const sendMail = (user, res) => {
+	var mailOptions = {
+		from: process.env.NODEMAILER_EMAIL,
+		to: user.email,
+		subject: "Reset Password Token",
+		text:
+			`Hey ${user.name},\n\n` +
+			"I'm Shreyas, the owner of Extreme Gaming Store. If you didn't " +
+			"try to reset your password on my website, please ignore this mail.\n" +
+			"However, if you did, here's your password reset link: \n" +
+			process.env.CLIENT +
+			"/forgot-password?token=" +
+			createToken(user._id) +
+			"\nYou can reply to this mail for any queries." +
+			"\n\nRegards\nShreyas Jamkhandi",
+	};
+
+	transporter.sendMail(mailOptions, function (err, msg) {
+		if (err) {
+			console.log("send mail error -", err.message);
+			res.json({ error: "Couldn't send mail to your address." });
+		} else {
+			console.log(
+				`sent account verification email to ${user.email} sucessfully.`
+			);
+			res.json("Sent mail");
+			// res.json(true);
+		}
+	});
+};
 
 exports.google = (req, res) => {
 	const { name, email, googleId } = req.body;

@@ -18,6 +18,7 @@ import Delete from "./core/delete";
 import Verify from "./user/verify";
 import ResetPassword from "./user/resetPass";
 import Purchases from "./user/purchases";
+import ForgotPassword from "./user/forgotPass";
 
 const Routes = () => {
 	return (
@@ -28,6 +29,7 @@ const Routes = () => {
 				<Route path="/signin" exact component={Signin} />
 				<Route path="/cart" exact component={Cart} />
 				<Route path="/verify" exact component={Verify} />
+				<Route path="/forgot-password" exact component={ForgotPassword} />
 				<PrivateRoute path="/reset-password" exact component={ResetPassword} />
 				<PrivateRoute path="/purchases" exact component={Purchases} />
 				<Route path="/delete-account" exact component={Delete} />

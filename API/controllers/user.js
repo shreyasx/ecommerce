@@ -93,7 +93,7 @@ const sendMail = (user, res) => {
 			"However, if you did, you can verify your account by clicking the link: \n" +
 			API +
 			"/confirmation?token=" +
-			createToken(user.id) +
+			createToken(user._id) +
 			"\nYou can reply to this mail for any queries." +
 			"\n\nRegards\nShreyas Jamkhandi",
 	};

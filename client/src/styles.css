@@ -23,6 +23,14 @@ footer {
 	color: white;
 }
 
+.forgot {
+	color: white;
+}
+
+.forgot:hover {
+	color: white;
+}
+
 @media only screen and (max-width: 768px) {
 	#carttt {
 		padding: 0 !important;
