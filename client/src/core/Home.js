@@ -40,7 +40,7 @@ export default function Home() {
 	const getCategories = () => {
 		fetch(`${API}/getCategories`)
 			.then(r => r.json())
-			.then(resp => setCategories(resp))
+			.then(setCategories)
 			.catch(console.log);
 	};
 
@@ -116,7 +116,7 @@ export default function Home() {
 						<div className="row">
 							{products.map((product, index) => {
 								return (
-									<div key={index} className="col-md-4 mb-4">
+									<div key={index} className="col-md-4 col-sm-6 col-xl-3 mb-4">
 										<Card product={product} />
 									</div>
 								);
