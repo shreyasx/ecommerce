@@ -7,21 +7,23 @@ const ForgotPassword = ({ match }) => {
 	const [email, setEmail] = useState("");
 	const [loading, setLoading] = useState(false);
 
-	const onSubmit = () => {
+	const onSubmit = e => {
+		e.preventDefault();
 		setLoading(true);
-		fetch(`${API}/send-reset-password-link`, {
+		fetch(`${API}/sendResetPasswordLink`, {
 			method: "POST",
 			headers: {
 				Accept: "application/json",
 				"Content-Type": "application/json",
 			},
-			body: JSON.stringify(email),
+			body: JSON.stringify({ email }),
 		})
 			.then(R => R.json())
 			.then(resp => {
-				console.log(resp);
+				if (resp === true)
+					toast("Password reset link sent!", { type: "success" });
+				else toast("Check your email address!", { type: "error" });
 				setLoading(false);
-				toast("Password reset link sent!", { type: "success" });
 			})
 			.catch(console.log);
 	};
@@ -29,7 +31,7 @@ const ForgotPassword = ({ match }) => {
 	return (
 		<Base
 			title="Forgot password"
-			description="If there exists an account linked with your entered email, you'll get a link to reset your password."
+			description="We will send you a link to reset your password."
 		>
 			{loading ? (
 				<img
@@ -50,6 +52,7 @@ const ForgotPassword = ({ match }) => {
 									type="email"
 								></input>
 								<button
+									type="submit"
 									onClick={onSubmit}
 									className="btn btn-success btn-block"
 								>

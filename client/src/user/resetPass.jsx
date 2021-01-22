@@ -56,7 +56,7 @@ const ResetPassword = () => {
 				"Content-Type": "application/json",
 				Authorization: `Bearer ${isAuthenticated().token}`,
 			},
-			body: JSON.stringify({ password: newP }),
+			body: JSON.stringify({ pass1: newP, pass2: newP2 }),
 		})
 			.then(R => R.json())
 			.then(resp => {
@@ -88,7 +88,7 @@ const ResetPassword = () => {
 						"Content-Type": "application/json",
 						Authorization: `Bearer ${isAuthenticated().token}`,
 					},
-					body: JSON.stringify({ password: newP }),
+					body: JSON.stringify({ pass1: newP, pass2: newP2 }),
 				})
 					.then(R => R.json())
 					.then(resp => {

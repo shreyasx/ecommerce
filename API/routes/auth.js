@@ -1,17 +1,20 @@
 var express = require("express");
 var router = express.Router();
-const cors = require("cors");
 
 const { check } = require("express-validator");
 const {
 	signout,
 	signup,
 	signin,
-	isSignedIn,
 	facebook,
 	google,
 	forgotPassword,
+	confirmPasswordReset,
 } = require("../controllers/auth");
+
+const { updateUser } = require("../controllers/user");
+
+router.param("token", confirmPasswordReset);
 
 router.post(
 	"/signup",
@@ -38,6 +41,7 @@ router.post(
 );
 
 router.get("/signout", signout);
-router.post("/send-reset-password-link", cors(), forgotPassword);
+router.post("/sendResetPasswordLink", forgotPassword);
+router.post("/forgot/:token", updateUser);
 
 module.exports = router;

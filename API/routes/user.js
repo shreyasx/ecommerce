@@ -25,7 +25,7 @@ router.get(
 );
 router.get("/delete/:userId", isSignedIn, isAuthenticated, deleteUser);
 router.get("/verify/:userId", isSignedIn, isAuthenticated, verify);
-router.get("/confirmation", confirmationPost);
+router.post("/verify-email", confirmationPost);
 router.post("/update/:userId", isSignedIn, isAuthenticated, updateUser);
 router.get("/getStatus/:userId", isSignedIn, isAuthenticated, getStatus);
 

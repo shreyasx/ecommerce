@@ -2,8 +2,6 @@ const User = require("../models/user");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const Token = require("../models/Token");
-const { validationResult } = require("express-validator");
-const API = "http://localhost:8000/api";
 const Order = require("../models/order");
 const Cart = require("../models/cart");
 
@@ -19,41 +17,25 @@ exports.getStatus = (req, res) => {
 };
 
 exports.confirmationPost = (req, res, next) => {
-	const errors = validationResult(req);
-	const { token } = req.query;
-	if (!errors.isEmpty()) {
-		return res.status(422).json({
-			error: errors.array()[0].msg,
-		});
-	}
+	const { token } = req.body;
 	Token.findOne({ token }, function (err, token) {
-		if (!token)
-			return res.status(400).send({
-				type: "not-verified",
-				msg:
-					"We were unable to find a valid token. Your token my have expired.",
-			});
+		if (!token) return res.json({ error: "Invalid token" });
+		if (token.createdAt < Date.now() + 1800000)
+			return res.json({ error: "Token expired" });
 
-		// If we found a token, find a matching user
 		User.findOne({ _id: token.userId }, function (e, user) {
-			if (!user)
-				return res
-					.status(400)
-					.send({ msg: "We were unable to find a user for this token." });
+			if (!user) return res.json({ error: "Invalid token" });
 			if (user.verified)
-				return res.status(400).send({
-					type: "already-verified",
-					msg: "This user has already been verified.",
+				return res.json({
+					error: "This user has already been verified.",
 				});
 
 			// Verify and save the user
 			user.verified = true;
 			console.log(`${user.name} - Verified.`);
-			user.save(function (err) {
-				if (err) {
-					return res.status(500).send({ error: err.message });
-				}
-				res.status(200).send("The account has been verified. Please log in.");
+			user.save(function (er) {
+				if (er) return res.json({ error: err.message });
+				res.json(true);
 			});
 		});
 	});
@@ -91,8 +73,8 @@ const sendMail = (user, res) => {
 			"I'm Shreyas, the owner of Extreme Gaming Store. If you didn't " +
 			"create an account on my website, please ignore this mail.\n" +
 			"However, if you did, you can verify your account by clicking the link: \n" +
-			API +
-			"/confirmation?token=" +
+			process.env.CLIENT +
+			"verify/" +
 			createToken(user._id) +
 			"\nYou can reply to this mail for any queries." +
 			"\n\nRegards\nShreyas Jamkhandi",
@@ -145,7 +127,10 @@ exports.getUser = (req, res) => {
 };
 
 exports.updateUser = (req, res) => {
-	const { password } = req.body;
+	const { pass1, pass2 } = req.body;
+	var password;
+	if (pass1 === pass2) password = pass1;
+	else return res.json({ error: "Passwords must be same" });
 	if (password.length < 5)
 		return res.json({ error: "Password must be 5 or more characters." });
 	User.findOne({ _id: req.profile._id }, (err, user) => {
@@ -160,6 +145,7 @@ exports.updateUser = (req, res) => {
 			});
 		user.password = password;
 		user.save().then(() => res.json("donee"));
+		req.profile = null;
 	});
 };
 

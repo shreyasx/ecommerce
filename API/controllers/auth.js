@@ -2,15 +2,27 @@ const User = require("../models/user");
 const { body, validationResult } = require("express-validator");
 var jwt = require("jsonwebtoken");
 var expressJwt = require("express-jwt");
+const Token = require("../models/Token");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 
+exports.confirmPasswordReset = (req, res, next, token) => {
+	Token.findOne({ token }, function (err, token) {
+		if (err || !token) return res.json({ error: "Invalid token" });
+		if (token.createdAt + 1800000 < Date.now())
+			return res.json({ error: "Token expired" });
+		User.findOne({ _id: token.userId }, function (e, user) {
+			if (e || !user) return res.json({ error: "Invalid token" });
+			req.profile = user;
+			next();
+		});
+	});
+};
+
 exports.forgotPassword = (req, res) => {
-	console.log("email- ", req.body.email);
 	User.findOne({ email: req.body.email }, (er, user) => {
 		if (er || !user) {
-			// res.json(true);
-			res.json("no u found");
+			res.json(false);
 			return;
 		}
 		sendMail(user, res);
@@ -50,7 +62,7 @@ const sendMail = (user, res) => {
 			"try to reset your password on my website, please ignore this mail.\n" +
 			"However, if you did, here's your password reset link: \n" +
 			process.env.CLIENT +
-			"/forgot-password?token=" +
+			"forgot-password/" +
 			createToken(user._id) +
 			"\nYou can reply to this mail for any queries." +
 			"\n\nRegards\nShreyas Jamkhandi",
@@ -61,11 +73,8 @@ const sendMail = (user, res) => {
 			console.log("send mail error -", err.message);
 			res.json({ error: "Couldn't send mail to your address." });
 		} else {
-			console.log(
-				`sent account verification email to ${user.email} sucessfully.`
-			);
-			res.json("Sent mail");
-			// res.json(true);
+			console.log(`sent password reset link to ${user.email} sucessfully.`);
+			res.json(true);
 		}
 	});
 };
