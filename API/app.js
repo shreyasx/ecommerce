@@ -24,7 +24,7 @@ mongoose
 		useFindAndModify: false,
 	})
 	.then(() => {
-		console.log("DB CONNECTED");
+		console.log("MongoDB connected.");
 	});
 
 //Middlewares
@@ -47,5 +47,5 @@ const port = process.env.PORT || 8000;
 
 //Starting a server
 app.listen(port, () => {
-	console.log(`app is running at ${port}`);
+	console.log(`Listening on port :${port}.`);
 });
