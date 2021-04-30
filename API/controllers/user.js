@@ -20,7 +20,7 @@ exports.confirmationPost = (req, res, next) => {
 	const { token } = req.body;
 	Token.findOne({ token }, function (err, token) {
 		if (!token) return res.json({ error: "Invalid token" });
-		if (token.createdAt < Date.now() + 1800000)
+		if (token.createdAt + 1800000 < Date.now())
 			return res.json({ error: "Token expired" });
 
 		User.findOne({ _id: token.userId }, function (e, user) {
@@ -123,7 +123,7 @@ exports.getUserById = (req, res, next, id) => {
 exports.getUser = (req, res) => {
 	req.profile.salt = undefined;
 	req.profile.encry_password = undefined;
-	return res.json(req.profile);
+	return res.json(req.profile.verified);
 };
 
 exports.updateUser = (req, res) => {

@@ -20,9 +20,7 @@ const UserDashboard = () => {
 			},
 		})
 			.then(R => R.json())
-			.then(resp => {
-				setVerified(resp.verified);
-			})
+			.then(setVerified)
 			.catch(console.log);
 	};
 
@@ -79,7 +77,8 @@ const UserDashboard = () => {
 					</li>
 					{!verified && (
 						<li>
-							<Link
+							<span
+								id="verifyEmailAddressLink"
 								onClick={() => {
 									setLoading(true);
 									fetch(`${API}/verify/${isAuthenticated().user._id}`, {
@@ -106,7 +105,7 @@ const UserDashboard = () => {
 								}}
 							>
 								Verify email address
-							</Link>
+							</span>
 						</li>
 					)}
 				</ul>

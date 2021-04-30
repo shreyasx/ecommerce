@@ -19,6 +19,23 @@ const Cart = () => {
 	const [reload, setReload] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [payLoading, setPayLoading] = useState(false);
+	const [verified, setVerified] = useState(false);
+
+	const isVerified = () => {
+		fetch(`${API}/user/${isAuthenticated().user._id}`, {
+			method: "GET",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${isAuthenticated().token}`,
+			},
+		})
+			.then(R => R.json())
+			.then(setVerified)
+			.catch(console.log);
+	};
+
+	useEffect(isVerified);
 
 	const getPrice = () => {
 		var price = 0;
@@ -63,7 +80,7 @@ const Cart = () => {
 		async function handleToken(token, addresses) {
 			setPayLoading(true);
 			setLoading(true);
-			const response = await axios.post("http://localhost:8000/api/checkout", {
+			const response = await axios.post(`${API}/checkout`, {
 				token,
 				product,
 				idList,
@@ -118,14 +135,18 @@ const Cart = () => {
 				) : (
 					<>
 						<h2>This Section for Checking out:</h2>
-						<StripeCheckout
-							stripeKey="pk_test_51IBXOSJZ5SfvqGzXiCyNg9KYR752jDXw1VmT0ZZJk4TtGnh0uioNCnLYWj1RMLPExNgyc5Py80yvr5zprsFQCdTp00MgYD5aGu"
-							token={handleToken}
-							amount={getPrice() * 100}
-							name="Products"
-							billingAddress
-							shippingAddress
-						/>
+						{verified ? (
+							<StripeCheckout
+								stripeKey="pk_test_51IBXOSJZ5SfvqGzXiCyNg9KYR752jDXw1VmT0ZZJk4TtGnh0uioNCnLYWj1RMLPExNgyc5Py80yvr5zprsFQCdTp00MgYD5aGu"
+								token={handleToken}
+								amount={getPrice() * 100}
+								name="Products"
+								billingAddress
+								shippingAddress
+							/>
+						) : (
+							"Verify your account to continue with your order."
+						)}
 					</>
 				)}
 			</>

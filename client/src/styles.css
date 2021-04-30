@@ -37,3 +37,8 @@ footer {
 		margin: 0;
 	}
 }
+
+#verifyEmailAddressLink:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
