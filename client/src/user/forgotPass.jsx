@@ -30,8 +30,8 @@ const ForgotPassword = ({ match }) => {
 
 	return (
 		<Base
-			title="Forgot password"
-			description="We will send you a link to reset your password."
+			title="Forgot password?"
+			description="No worries. We will email you a link to reset your password."
 		>
 			{loading ? (
 				<img

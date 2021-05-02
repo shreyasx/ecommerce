@@ -23,7 +23,7 @@ const Verify = ({ match }) => {
 			.catch(console.log);
 	};
 
-	useEffect(check, []);
+	useEffect(check);
 
 	return (
 		<Base title="Account Verification Page" description="">

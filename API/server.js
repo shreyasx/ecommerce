@@ -4,6 +4,7 @@ const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const helmet = require("helmet");
 
 //My routes
 const authRoutes = require("./routes/auth");
@@ -30,6 +31,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(cors());
+app.use(helmet());
 
 //My Routes
 app.use("/api", authRoutes);

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { API } from "../backend";
 import Base from "../core/Base";
 
-const NewPassword = ({ match }) => {
+const NewPassword = ({ match, history }) => {
 	const [pass1, setPass1] = useState("");
 	const [pass2, setPass2] = useState("");
 	const [loading, setLoading] = useState(false);
@@ -24,9 +24,12 @@ const NewPassword = ({ match }) => {
 			.then(resp => {
 				if (resp.error) setError(resp.error);
 				else {
-          setSuccess(true);
-          setError("");
-        }
+					setSuccess(true);
+					setError("");
+					setTimeout(() => {
+						history.push("/signin");
+					}, 3000);
+				}
 				setLoading(false);
 			})
 			.catch(console.log);
@@ -55,7 +58,7 @@ const NewPassword = ({ match }) => {
 						className="alert alert-success"
 						style={{ display: success ? "" : "none" }}
 					>
-						Password updated successfully.
+						Password updated successfully. Taking you to the signin page...
 					</div>
 				</div>
 			</div>

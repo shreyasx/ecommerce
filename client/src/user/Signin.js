@@ -175,7 +175,7 @@ const Signin = () => {
 	};
 
 	const componentClicked = () => {
-		setValues({ ...values, error: false, loading: true });
+		setValues({ ...values, error: false });
 	};
 
 	const responseFacebook = response => {
@@ -203,6 +203,7 @@ const Signin = () => {
 						setValues({
 							...values,
 							didRedirect: true,
+							loading: false,
 						});
 					});
 				}

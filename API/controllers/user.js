@@ -130,7 +130,7 @@ exports.updateUser = (req, res) => {
 	const { pass1, pass2 } = req.body;
 	var password;
 	if (pass1 === pass2) password = pass1;
-	else return res.json({ error: "Passwords must be same" });
+	else return res.json({ error: "Passwords must be the same." });
 	if (password.length < 5)
 		return res.json({ error: "Password must be 5 or more characters." });
 	User.findOne({ _id: req.profile._id }, (err, user) => {
@@ -144,7 +144,18 @@ exports.updateUser = (req, res) => {
 				error: "New password must be different from your existing password.",
 			});
 		user.password = password;
-		user.save().then(() => res.json("donee"));
+		user
+			.save()
+			.then(resp => {
+				const { token } = req.params;
+				Token.deleteOne({ token }).then(re => {
+					console.log(`Password updated and deleted token for ${user.email}`);
+					res.json("doneee");
+				});
+			})
+			.catch(e =>
+				res.status(400).json({ error: "Couldn't update your password." })
+			);
 		req.profile = null;
 	});
 };
