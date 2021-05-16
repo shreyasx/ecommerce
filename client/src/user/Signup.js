@@ -100,7 +100,7 @@ const Signup = () => {
 							style={{ textAlign: "center", margin: "20px auto" }}
 						>
 							<FacebookLogin
-								appId="432706677778563"
+								appId={process.env.REACT_APP_FACEBOOK_APPID}
 								autoLoad={false}
 								fields="name,email"
 								onClick={componentClicked}
@@ -117,7 +117,7 @@ const Signup = () => {
 								)}
 							/> */}
 							<GoogleLogin
-								clientId="327673455287-3gd4knbeek3bsb86tkbcl29oagpppbg4.apps.googleusercontent.com"
+								clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
 								buttonText="Continue with Google"
 								onSuccess={responseGoogle}
 								onFailure={responseGoogle}
@@ -218,7 +218,7 @@ const Signup = () => {
 
 	return (
 		<Base
-			title="Signup to Extreme Game Store"
+			title="Signup to Xtreme Gameshop"
 			description="Signup now to be able to buy your favourite games!"
 		>
 			{loadingMessage()}
