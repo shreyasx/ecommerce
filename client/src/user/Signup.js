@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import Base from "../core/Base";
 import { signup } from "../auth/helper";
-import FacebookLogin from "react-facebook-login";
-import { API } from "../backend";
+import Buttons from "./social-buttons";
 import { toast } from "react-toastify";
-import { authenticate, signin, isAuthenticated } from "../auth/helper";
+import { authenticate, isAuthenticated } from "../auth/helper";
 import { Redirect } from "react-router-dom";
-// import FacebookLogin from "react-facebook-login/dist/facebook-login-render-props";
-import { GoogleLogin } from "react-google-login";
+import Particles from "react-particles-js";
+import bodyConfig from "../body";
 
 const Signup = () => {
 	const [values, setValues] = useState({
@@ -27,36 +26,23 @@ const Signup = () => {
 
 	const onSubmit = event => {
 		event.preventDefault();
+		setValues({ ...values, loading: true });
 		signup({ name, email, password })
 			.then(data => {
 				if (data.error) {
+					setValues({ ...values, loading: false });
 					toast(data.error, { type: "error" });
-				} else
-					signin({ email, password })
-						.then(dat => {
-							if (dat.error) {
-								setValues({
-									...values,
-									loading: false,
-								});
-								toast(data.error, {
-									type: "error",
-								});
-							} else {
-								authenticate(dat, () => {
-									setValues({
-										...values,
-										didRedirect: true,
-									});
-								});
-							}
-						})
-						.catch(er => {
-							console.log("Signin request failed");
+				} else {
+					authenticate(data, () => {
+						setValues({
+							...values,
+							didRedirect: true,
 						});
+					});
+				}
 			})
 			.catch(er => {
-				console.log("Error in signup");
+				console.log("Signin request failed");
 			});
 	};
 
@@ -95,101 +81,11 @@ const Signup = () => {
 						<button onClick={onSubmit} className="btn btn-success btn-block">
 							Submit
 						</button>
-						<div
-							className="fb-login"
-							style={{ textAlign: "center", margin: "20px auto" }}
-						>
-							<FacebookLogin
-								appId={process.env.REACT_APP_FACEBOOK_APPID}
-								autoLoad={false}
-								fields="name,email"
-								onClick={componentClicked}
-								callback={responseFacebook}
-							/>
-							{/* <FacebookLogin
-								appId="432706677778563"
-								autoLoad={false}
-								callback={responseFacebook}
-								render={renderProps => (
-									<button onClick={renderProps.onClick}>
-										This is my custom FB button
-									</button>
-								)}
-							/> */}
-							<GoogleLogin
-								clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
-								buttonText="Continue with Google"
-								onSuccess={responseGoogle}
-								onFailure={responseGoogle}
-								cookiePolicy={"single_host_origin"}
-							/>
-						</div>
+						<Buttons setValues={setValues} values={values} />
 					</form>
 				</div>
 			</div>
 		);
-	};
-
-	const responseGoogle = response => {
-		const { name, email, googleId } = response.profileObj;
-		fetch(`${API}/signup/google`, {
-			method: "POST",
-			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ name, email, googleId }),
-		})
-			.then(r => r.json())
-			.then(data => {
-				if (data.error) {
-					setValues({ ...values, loading: false });
-					toast(data.error, { type: "error" });
-				} else {
-					authenticate(data, () => {
-						setValues({
-							...values,
-							didRedirect: true,
-						});
-					});
-				}
-			})
-			.catch(er => {
-				console.log("Signin request failed");
-			});
-	};
-
-	const componentClicked = () => {
-		setValues({ ...values, loading: true });
-	};
-
-	const responseFacebook = response => {
-		const { name, email, userID } = response;
-		fetch(`${API}/signup/facebook`, {
-			method: "POST",
-			headers: {
-				Accept: "application/json",
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ name, email, userID }),
-		})
-			.then(r => r.json())
-			.then(data => {
-				if (data.error) {
-					setValues({ ...values, loading: false });
-					toast(data.error, { type: "error" });
-				} else {
-					authenticate(data, () => {
-						setValues({
-							...values,
-							didRedirect: true,
-						});
-					});
-				}
-			})
-			.catch(er => {
-				console.log("Signin request failed");
-			});
 	};
 
 	const loadingMessage = () => {
@@ -217,14 +113,17 @@ const Signup = () => {
 	};
 
 	return (
-		<Base
-			title="Signup to Xtreme Gameshop"
-			description="Signup now to be able to buy your favourite games!"
-		>
-			{loadingMessage()}
-			{signupForm()}
-			{performRedirect()}
-		</Base>
+		<>
+			<Particles params={bodyConfig} />
+			<Base
+				title="Signup to Xtreme Gameshop"
+				description="Signup now to be able to buy your favourite games!"
+			>
+				{loadingMessage()}
+				{signupForm()}
+				{performRedirect()}
+			</Base>
+		</>
 	);
 };
 

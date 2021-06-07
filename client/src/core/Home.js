@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import "../styles.css";
 import Base from "./Base";
-import Card from "./Card";
+import Card2 from "./newCard";
 import { getProducts } from "./helper/coreapicalls";
 import { API } from "../backend";
+import Particles from "react-particles-js";
+import bodyConfig from "../body";
 
 export default function Home() {
 	const [products, setProducts] = useState([]);
@@ -28,9 +30,11 @@ export default function Home() {
 			loadAllProducts();
 			return;
 		}
-		fetch(`${API}/getProducts?categ=${category}`)
+		console.log(`${API}/getProducts?category=${category}`);
+		fetch(`${API}/getProducts?category=${category}`)
 			.then(re => re.json())
 			.then(resp => {
+				console.log(resp);
 				setProducts(resp);
 				setLoading(false);
 			})
@@ -50,78 +54,104 @@ export default function Home() {
 	}, []);
 
 	return (
-		<Base title="Xtreme Gameshop" description="Find your most desired games!">
-			<h1 className="text-white">Our Games Collection</h1>
-			<div className="row text-center">
+		<>
+			<Particles params={bodyConfig} />
+			<Base
+				id="main-title"
+				title="XTREME Gameshop"
+				description="Find your most desired games!"
+			>
+				<div className="row">
+					<h1 style={{ margin: "0px auto" }} className="text-white">
+						Our Top Games Collection
+					</h1>
+				</div>
+
 				{error ? error : ""}
 				{categories.length > 0 ? (
-					<h2 style={{ margin: "20px" }} className="text-white">
-						{"Pick a Category: "}&nbsp;&nbsp;&nbsp;
-						<button
-							className="btn booboo btn-success"
-							onClick={() => {
-								var buttons = document.querySelectorAll(".booboo");
-								for (var index = 0; index < buttons.length; index++) {
-									buttons[index].classList.remove("btn-success");
-									buttons[index].classList.add("btn-outline-success");
-								}
-								document.activeElement.classList.remove("btn-outline-success");
-								document.activeElement.classList.add("btn-success");
-								categoryChange("All");
-							}}
-						>
-							All Games
-						</button>
-						&nbsp;&nbsp;
-						{categories.map((c, i) => (
-							<span key={i + 99}>
-								<button
-									className="btn booboo btn-outline-success"
-									onClick={() => {
-										var buttons = document.querySelectorAll(".booboo");
-										for (var index = 0; index < buttons.length; index++) {
-											buttons[index].classList.remove("btn-success");
-											buttons[index].classList.add("btn-outline-success");
-										}
-										document.activeElement.classList.remove(
-											"btn-outline-success"
-										);
-										document.activeElement.classList.add("btn-success");
-										categoryChange(c._id);
-									}}
-								>
-									{c.name}
-								</button>
-								&nbsp;&nbsp;
-							</span>
-						))}
-					</h2>
+					<div className="row text-white">
+						<div style={{ margin: "20px auto", textAlign: "center" }}>
+							<h2 style={{ display: "inline" }}>
+								{"Pick a Category: "}&nbsp;&nbsp;&nbsp;
+							</h2>
+							<button
+								className="btn booboo btn-success"
+								onClick={() => {
+									var buttons = document.querySelectorAll(".booboo");
+									for (var index = 0; index < buttons.length; index++) {
+										buttons[index].classList.remove("btn-success");
+										buttons[index].classList.add("btn-outline-success");
+									}
+									document.activeElement.classList.remove(
+										"btn-outline-success"
+									);
+									document.activeElement.classList.add("btn-success");
+									categoryChange("All");
+								}}
+							>
+								All Games
+							</button>
+							&nbsp;&nbsp;
+							{categories.map((c, i) => (
+								<span key={i + 99}>
+									<button
+										className="btn booboo btn-outline-success"
+										onClick={() => {
+											var buttons = document.querySelectorAll(".booboo");
+											for (var index = 0; index < buttons.length; index++) {
+												buttons[index].classList.remove("btn-success");
+												buttons[index].classList.add("btn-outline-success");
+											}
+											document.activeElement.classList.remove(
+												"btn-outline-success"
+											);
+											document.activeElement.classList.add("btn-success");
+											categoryChange(c._id);
+										}}
+									>
+										{c.name}
+									</button>
+									&nbsp;&nbsp;
+								</span>
+							))}
+						</div>
+					</div>
 				) : (
 					""
 				)}
 				{loading ? (
-					<>
+					<div
+						className="row"
+						style={{
+							justifyContent: "center",
+							alignItems: "center",
+							minWidth: "100vw",
+						}}
+					>
 						<img
 							style={{ width: "200px" }}
 							src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Youtube_loading_symbol_1_(wobbly).gif"
 							alt="loading"
 						/>
 						<h3 className="text-white">Loading Games...</h3>
-					</>
+					</div>
 				) : (
 					<>
-						<div className="row">
+						<div
+							className="row"
+							style={{ justifyContent: "center", minWidth: "100vw" }}
+						>
 							{products.map((product, index) => {
 								return (
-									<div key={index} className="col-md-4 col-sm-6 col-xl-3 mb-4">
-										<Card product={product} />
+									<div key={index} style={{ margin: "20px 20px" }}>
+										<Card2 product={product} />
 									</div>
 								);
 							})}
 						</div>
 					</>
 				)}
-			</div>
-		</Base>
+			</Base>
+		</>
 	);
 }

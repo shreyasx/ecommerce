@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../styles.css";
 import Base from "./Base";
-import Card from "./Card";
+import Card2 from "./newCard";
 import { loadCart } from "./helper/carthelper";
 import { isAuthenticated } from "../auth/helper";
 import { Link } from "react-router-dom";
@@ -11,6 +11,8 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { emptyCart } from "./helper/carthelper";
 import { API } from "../backend";
+import Particles from "react-particles-js";
+import bodyConfig from "../body";
 
 toast.configure();
 
@@ -35,7 +37,7 @@ const Cart = () => {
 			.catch(console.log);
 	};
 
-	useEffect(isVerified);
+	useEffect(isVerified, []);
 
 	const getPrice = () => {
 		var price = 0;
@@ -49,23 +51,30 @@ const Cart = () => {
 			setProducts(ps);
 			setLoading(false);
 		})();
-	}, [reload]);
+	}, []);
 
 	const loadAllProducts = () => {
 		if (products.length === 0) return "No items in your cart. Go add some now!";
 		else
 			return (
-				<div>
+				<div className="row" style={{ alignItems: "flex-start" }}>
 					{products.map((product, index) => (
-						<Card
-							key={index}
-							product={product}
-							addtoCart={false}
-							removeFromCart={true}
-							setReload={setReload}
-							reload={reload}
-							cart={true}
-						/>
+						<div key={index} style={{ margin: "10px 10px" }}>
+							<Card2
+								callback={async () => {
+									const ps = await loadCart(isAuthenticated().user._id);
+									setProducts(ps);
+									setLoading(false);
+									toast("Item removed from cart.", { type: "success" });
+								}}
+								product={product}
+								addtoCart={false}
+								removeFromCart={true}
+								setReload={setReload}
+								reload={reload}
+								cart={true}
+							/>
+						</div>
 					))}
 				</div>
 			);
@@ -137,7 +146,7 @@ const Cart = () => {
 						<h2>This Section for Checking out:</h2>
 						{verified ? (
 							<StripeCheckout
-								stripeKey="pk_test_51IBXOSJZ5SfvqGzXiCyNg9KYR752jDXw1VmT0ZZJk4TtGnh0uioNCnLYWj1RMLPExNgyc5Py80yvr5zprsFQCdTp00MgYD5aGu"
+								stripeKey={process.env.REACT_APP_STRIPE_KEY}
 								token={handleToken}
 								amount={getPrice() * 100}
 								name="Products"
@@ -145,7 +154,7 @@ const Cart = () => {
 								shippingAddress
 							/>
 						) : (
-							"Verify your account to continue with your order."
+							`Go to user dashboard and verify your email address to continue with your order.`
 						)}
 					</>
 				)}
@@ -154,23 +163,26 @@ const Cart = () => {
 	};
 
 	return (
-		<Base title="Your Cart" description="Ready to checkout">
-			<div className="row text-white">
-				{!isAuthenticated().user ? (
-					<h6>
-						Please <Link to="/signin">SignIn</Link> first.
-					</h6>
-				) : (
-					<>
-						<div className="col-md-6">
-							<h2>Your Cart:</h2>
-							{loading ? <h2>Loading Cart...</h2> : loadAllProducts()}
-						</div>
-						<div className="col-md-6">{loadCheckout()}</div>
-					</>
-				)}
-			</div>
-		</Base>
+		<>
+			<Particles params={bodyConfig} />
+			<Base title="Your Cart" description="Ready to checkout">
+				<div className="row text-white">
+					{!isAuthenticated().user ? (
+						<h6>
+							Please <Link to="/signin">SignIn</Link> to access your cart.
+						</h6>
+					) : (
+						<>
+							<div className="col-md-8">
+								<h2>Your Cart:</h2>
+								{loading ? <h2>Loading Cart...</h2> : loadAllProducts()}
+							</div>
+							<div className="col-md-4">{loadCheckout()}</div>
+						</>
+					)}
+				</div>
+			</Base>
+		</>
 	);
 };
 
