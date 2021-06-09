@@ -1,0 +1,6 @@
+[submodule "client"]
+	path = client
+	url = https://github.com/shreyasx/xtremegameshop-frontend
+[submodule "API"]
+	path = API
+	url = https://github.com/shreyasx/xtremegameshop-api
